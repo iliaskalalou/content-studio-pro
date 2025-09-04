@@ -325,8 +325,8 @@ class TikTokSandboxPublisher:
 
 if __name__ == "__main__":
     # Configuration SANDBOX
-    CLIENT_KEY = "YOUR_CLIENT_KEY"  # Remplacez par votre client key
-    CLIENT_SECRET = "YOUR_CLIENT_SECRET"  # Remplacez par votre client secret
+    CLIENT_KEY = "sbaw9sck9i4u94jbyw"  # Votre client key
+    CLIENT_SECRET = "Iwl5nMhrxo3S5xUfixLam6Ha74DR19am"  # Votre client secret
     
     if len(sys.argv) < 2:
         print("Usage: python3 sandbox_demo.py <video_file>")

@@ -181,8 +181,8 @@ class TikTokSimplifiedDemo:
 
 
 if __name__ == "__main__":
-    CLIENT_KEY = "YOUR_CLIENT_KEY"
-    CLIENT_SECRET = "YOUR_CLIENT_SECRET"
+    CLIENT_KEY = "sbaw9sck9i4u94jbyw"
+    CLIENT_SECRET = "Iwl5nMhrxo3S5xUfixLam6Ha74DR19am"
     
     if len(sys.argv) < 2:
         print("Usage: python3 simple_demo.py <video.mp4>")
