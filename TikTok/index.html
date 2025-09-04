@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok OAuth Redirect - Pianorama Publish</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            margin-bottom: 1rem;
+        }
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .message {
+            margin-top: 1rem;
+            opacity: 0.9;
+        }
+        .url {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Pianorama Publish</h1>
+        <h2>TikTok OAuth Redirect</h2>
+        <div class="spinner"></div>
+        <p class="message">Authentication successful!</p>
+        <p>Copy the URL above and paste it in your terminal</p>
+        <div class="url" id="currentUrl"></div>
+    </div>
+    
+    <script>
+        // Display current URL with parameters
+        document.getElementById('currentUrl').textContent = window.location.href;
+        
+        // Log for debugging
+        console.log('TikTok OAuth Callback URL:', window.location.href);
+        console.log('Query Parameters:', window.location.search);
+        
+        // Extract code if present
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        if (code) {
+            console.log('Authorization Code:', code);
+        }
+    </script>
+</body>
+</html>
