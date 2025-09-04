@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Pianorama Publish - TikTok Integration</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .status {
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            display: none;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .user-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        
+        .user-info img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-section {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Pianorama Publish</h1>
+        
+        <!-- Status Messages -->
+        <div id="statusMessage" class="status"></div>
+        
+        <!-- Not Connected -->
+        <div id="notConnected">
+            <h2>Connect to TikTok</h2>
+            <p style="margin: 1rem 0;">Connect your TikTok account to start publishing videos directly from our platform.</p>
+            
+            <button onclick="connectTikTok()" class="btn">
+                <i class="fab fa-tiktok"></i> Connect with TikTok
+            </button>
+            
+            <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 10px;">
+                <h4>What we'll access:</h4>
+                <ul style="list-style: none; padding: 0;">
+                    <li>✓ Your profile information</li>
+                    <li>✓ Ability to publish videos</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Connected -->
+        <div id="connected" class="hidden">
+            <h2>Connected to TikTok</h2>
+            
+            <div id="userInfo" class="user-info">
+                <div class="spinner"></div>
+                <p>Loading user info...</p>
+            </div>
+            
+            <div class="upload-section">
+                <h3>📹 Publish Video</h3>
+                <input type="text" id="videoTitle" placeholder="Video title" style="width: 100%; padding: 0.5rem; margin: 1rem 0;">
+                <input type="text" id="videoUrl" placeholder="Video URL" style="width: 100%; padding: 0.5rem; margin: 1rem 0;">
+                <select id="privacyLevel" style="width: 100%; padding: 0.5rem; margin: 1rem 0;">
+                    <option value="SELF_ONLY">Private (Only me)</option>
+                    <option value="MUTUAL_FOLLOW_FRIENDS">Friends</option>
+                    <option value="PUBLIC_TO_EVERYONE">Public</option>
+                </select>
+                <button onclick="publishVideo()" class="btn">
+                    <i class="fas fa-upload"></i> Publish to TikTok
+                </button>
+            </div>
+            
+            <button onclick="disconnect()" class="btn" style="background: #dc3545;">
+                <i class="fas fa-sign-out-alt"></i> Disconnect
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // Configuration - À METTRE À JOUR après déploiement
+        const BACKEND_URL = 'https://your-app.railway.app'; // REMPLACEZ PAR VOTRE URL BACKEND
+        let accessToken = null;
+        
+        // Check URL parameters on load
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const success = urlParams.get('success');
+            const error = urlParams.get('error');
+            
+            if (token && success === 'true') {
+                // OAuth successful
+                accessToken = token;
+                localStorage.setItem('tiktok_token', token);
+                showStatus('success', 'Successfully connected to TikTok!');
+                showConnected();
+                loadUserInfo();
+                
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else if (error) {
+                showStatus('error', `Authentication failed: ${error}`);
+            } else {
+                // Check if already connected
+                const savedToken = localStorage.getItem('tiktok_token');
+                if (savedToken) {
+                    accessToken = savedToken;
+                    showConnected();
+                    loadUserInfo();
+                }
+            }
+        });
+        
+        function connectTikTok() {
+            // Redirect to backend OAuth endpoint
+            window.location.href = `${BACKEND_URL}/auth`;
+        }
+        
+        function showConnected() {
+            document.getElementById('notConnected').classList.add('hidden');
+            document.getElementById('connected').classList.remove('hidden');
+        }
+        
+        function showNotConnected() {
+            document.getElementById('connected').classList.add('hidden');
+            document.getElementById('notConnected').classList.remove('hidden');
+        }
+        
+        async function loadUserInfo() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/user-info`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const user = await response.json();
+                    document.getElementById('userInfo').innerHTML = `
+                        <img src="${user.avatar_url || 'https://via.placeholder.com/80'}" alt="Avatar">
+                        <h3>${user.display_name || 'TikTok User'}</h3>
+                        <p>@${user.username || 'username'}</p>
+                    `;
+                } else {
+                    document.getElementById('userInfo').innerHTML = '<p>Could not load user info</p>';
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+                document.getElementById('userInfo').innerHTML = '<p>Error loading user info</p>';
+            }
+        }
+        
+        async function publishVideo() {
+            const title = document.getElementById('videoTitle').value;
+            const videoUrl = document.getElementById('videoUrl').value;
+            const privacy = document.getElementById('privacyLevel').value;
+            
+            if (!title || !videoUrl) {
+                showStatus('error', 'Please provide video title and URL');
+                return;
+            }
+            
+            showStatus('info', 'Publishing video to TikTok...');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/publish`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        video_url: videoUrl,
+                        privacy: privacy
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showStatus('success', result.message || 'Video published successfully!');
+                    
+                    // Clear form
+                    document.getElementById('videoTitle').value = '';
+                    document.getElementById('videoUrl').value = '';
+                } else {
+                    showStatus('error', 'Failed to publish video');
+                }
+            } catch (error) {
+                console.error('Error publishing:', error);
+                showStatus('error', 'Error publishing video');
+            }
+        }
+        
+        function disconnect() {
+            localStorage.removeItem('tiktok_token');
+            accessToken = null;
+            showNotConnected();
+            showStatus('info', 'Disconnected from TikTok');
+        }
+        
+        function showStatus(type, message) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.className = 'status ' + type;
+            statusEl.textContent = message;
+            statusEl.style.display = 'block';
+            
+            if (type !== 'error') {
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
