@@ -17,7 +17,10 @@ echo "   ✅ Procfile"
 echo ""
 
 echo "🔐 Connexion à Railway..."
-railway login
+echo "   Si l'erreur 'Error logging in to CLI' apparaît, utilisez :"
+echo "   railway login --browserless"
+echo ""
+railway login --browserless
 
 echo ""
 echo "🚂 Initialisation du projet Railway..."
