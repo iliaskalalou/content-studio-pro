@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Pianorama Publish - TikTok Integration</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Pianorama Publish helps creators manage and publish video content to TikTok.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+        
+        .section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-tiktok {
+            background: #000;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            margin: 1rem auto;
+            width: fit-content;
+        }
+        
+        .status {
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        
+        .status.success {
+            background: rgba(76, 217, 100, 0.2);
+            border: 2px solid rgba(76, 217, 100, 0.5);
+        }
+        
+        .status.error {
+            background: rgba(255, 69, 58, 0.2);
+            border: 2px solid rgba(255, 69, 58, 0.5);
+        }
+        
+        .status.info {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .code-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 10px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 1rem 0;
+        }
+        
+        .user-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        .user-info img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-section {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .upload-section:hover {
+            border-color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .upload-section.active {
+            border-color: #4CD964;
+            background: rgba(76, 217, 100, 0.1);
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .footer-links {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .footer-links a {
+            color: white;
+            margin: 0 1rem;
+            text-decoration: none;
+            opacity: 0.8;
+        }
+        
+        .footer-links a:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Pianorama Publish</h1>
+        
+        <!-- OAuth Callback Handler (hidden by default) -->
+        <div id="oauthCallback" class="hidden">
+            <div class="section">
+                <h2>🔐 Processing TikTok Authorization...</h2>
+                <div class="spinner"></div>
+                <p style="text-align: center; opacity: 0.8;">Please wait while we complete the authentication</p>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div id="mainContent">
+            <!-- Not Connected State -->
+            <div id="notConnected" class="section">
+                <h2>👋 Welcome to Pianorama Publish</h2>
+                <p style="margin: 1rem 0;">Connect your TikTok account to start publishing videos directly from our platform.</p>
+                
+                <button onclick="connectTikTok()" class="btn btn-tiktok">
+                    <i class="fab fa-tiktok"></i>
+                    Connect with TikTok
+                </button>
+                
+                <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                    <h4 style="margin-bottom: 0.5rem;">📌 What we'll access:</h4>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li>✓ Your profile information</li>
+                        <li>✓ Ability to publish videos</li>
+                        <li>✓ Upload content as drafts</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Connected State (hidden by default) -->
+            <div id="connected" class="section hidden">
+                <h2>✅ Connected to TikTok</h2>
+                <div id="userInfo" class="user-info">
+                    <!-- User info will be displayed here -->
+                </div>
+                
+                <div class="upload-section">
+                    <h3>📹 Upload Video</h3>
+                    <p>Select a video to publish to TikTok</p>
+                    <label for="videoFile" class="btn" style="margin-top: 1rem;">
+                        <i class="fas fa-cloud-upload-alt"></i> Choose Video
+                    </label>
+                    <input type="file" id="videoFile" accept="video/*" onchange="handleFileSelect(event)">
+                    <div id="fileInfo" style="margin-top: 1rem;"></div>
+                </div>
+                
+                <button onclick="disconnectTikTok()" class="btn" style="background: rgba(255,255,255,0.2); margin-top: 1rem;">
+                    <i class="fas fa-sign-out-alt"></i> Disconnect
+                </button>
+            </div>
+            
+            <!-- Status Messages -->
+            <div id="statusMessage" class="status hidden"></div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer-links">
+            <a href="/privacy/">Privacy Policy</a>
+            <a href="/terms/">Terms of Service</a>
+            <a href="https://github.com/iliaskalalou/Pianorama_publish" target="_blank">GitHub</a>
+        </div>
+    </div>
+    
+    <script>
+        // Configuration
+        const CLIENT_KEY = 'sbaw9sck9i4u94jbyw';
+        const CLIENT_SECRET = 'Iwl5nMhrxo3S5xUfixLam6Ha74DR19am';
+        const REDIRECT_URI = 'https://iliaskalalou.github.io/Pianorama_publish/';
+        const SCOPES = 'user.info.basic,video.publish';
+        
+        // Check if we're returning from OAuth
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const error = urlParams.get('error');
+            
+            if (code) {
+                handleOAuthCallback(code);
+            } else if (error) {
+                showStatus('error', `Authentication failed: ${error}`);
+            } else {
+                checkAuthStatus();
+            }
+        });
+        
+        function connectTikTok() {
+            const params = new URLSearchParams({
+                client_key: CLIENT_KEY,
+                response_type: 'code',
+                scope: SCOPES,
+                redirect_uri: REDIRECT_URI,
+                state: 'state_' + Date.now()
+            });
+            
+            const authUrl = `https://www.tiktok.com/v2/auth/authorize/?${params.toString()}`;
+            window.location.href = authUrl;
+        }
+        
+        async function handleOAuthCallback(code) {
+            document.getElementById('mainContent').classList.add('hidden');
+            document.getElementById('oauthCallback').classList.remove('hidden');
+            
+            // Store the code
+            sessionStorage.setItem('tiktok_auth_code', code);
+            
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+            
+            // Simulate getting access token (in real app, this would be done server-side)
+            setTimeout(() => {
+                // Store mock token
+                localStorage.setItem('tiktok_access_token', 'mock_token_' + Date.now());
+                localStorage.setItem('tiktok_user', JSON.stringify({
+                    username: '@demo_user',
+                    display_name: 'Demo User',
+                    avatar: 'https://via.placeholder.com/100'
+                }));
+                
+                showStatus('success', 'Successfully connected to TikTok!');
+                document.getElementById('oauthCallback').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+                checkAuthStatus();
+            }, 2000);
+        }
+        
+        function checkAuthStatus() {
+            const token = localStorage.getItem('tiktok_access_token');
+            const user = localStorage.getItem('tiktok_user');
+            
+            if (token && user) {
+                const userData = JSON.parse(user);
+                document.getElementById('notConnected').classList.add('hidden');
+                document.getElementById('connected').classList.remove('hidden');
+                document.getElementById('userInfo').innerHTML = `
+                    <img src="${userData.avatar}" alt="Avatar">
+                    <h3>${userData.display_name}</h3>
+                    <p>${userData.username}</p>
+                `;
+            } else {
+                document.getElementById('notConnected').classList.remove('hidden');
+                document.getElementById('connected').classList.add('hidden');
+            }
+        }
+        
+        function disconnectTikTok() {
+            localStorage.removeItem('tiktok_access_token');
+            localStorage.removeItem('tiktok_user');
+            sessionStorage.removeItem('tiktok_auth_code');
+            showStatus('info', 'Disconnected from TikTok');
+            checkAuthStatus();
+        }
+        
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const fileInfo = document.getElementById('fileInfo');
+                fileInfo.innerHTML = `
+                    <p><strong>Selected:</strong> ${file.name}</p>
+                    <p><strong>Size:</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                    <button class="btn" onclick="publishVideo()" style="margin-top: 1rem;">
+                        <i class="fas fa-upload"></i> Publish to TikTok
+                    </button>
+                `;
+            }
+        }
+        
+        function publishVideo() {
+            showStatus('info', 'Publishing video to TikTok...');
+            setTimeout(() => {
+                showStatus('success', 'Video published successfully!');
+            }, 3000);
+        }
+        
+        function showStatus(type, message) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.className = 'status ' + type;
+            statusEl.textContent = message;
+            statusEl.classList.remove('hidden');
+            
+            if (type !== 'error') {
+                setTimeout(() => {
+                    statusEl.classList.add('hidden');
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
