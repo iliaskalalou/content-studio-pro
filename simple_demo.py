@@ -16,7 +16,7 @@ class TikTokSimplifiedDemo:
     def __init__(self, client_key, client_secret):
         self.client_key = client_key
         self.client_secret = client_secret
-        self.redirect_uri = "https://iliaskalalou.github.io/TikTok/"  # URL vérifiée sur TikTok !
+        self.redirect_uri = "https://iliaskalalou.github.io/Pianorama_publish/TikTok/"  # URL correcte avec le repo name
         self.access_token = None
         # SANDBOX pour la démo
         self.base_url = "https://open-sandbox.tiktokapis.com"

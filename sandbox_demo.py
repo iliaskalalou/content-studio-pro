@@ -17,7 +17,7 @@ class TikTokSandboxPublisher:
     def __init__(self, client_key, client_secret, use_sandbox=True):
         self.client_key = client_key
         self.client_secret = client_secret
-        self.redirect_uri = "https://iliaskalalou.github.io/TikTok/"  # URL vérifiée sur TikTok !
+        self.redirect_uri = "https://iliaskalalou.github.io/Pianorama_publish/TikTok/"  # URL correcte avec le repo name
         self.access_token = None
         
         # IMPORTANT: Utiliser le sandbox pour la démo
