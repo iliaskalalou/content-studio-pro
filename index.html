@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Pianorama Publish - Professional Video Publishing Platform</title>
+    <title>Pianorama Publish - TikTok Integration</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Pianorama Publish helps creators manage and publish their video content across social media platforms efficiently.">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -15,1104 +14,308 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #333;
-        }
-        
-        /* Header */
-        header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1rem 0;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        nav {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .logo i {
-            font-size: 28px;
-        }
-        
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
-        
-        nav a {
-            color: white;
-            text-decoration: none;
-            transition: opacity 0.3s;
-        }
-        
-        nav a:hover {
-            opacity: 0.8;
-        }
-        
-        .btn-primary {
-            background: white;
-            color: #667eea;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: 600;
-            transition: transform 0.3s;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-        }
-        
-        /* Hero Section */
-        .hero {
-            margin-top: 70px;
-            padding: 80px 20px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            text-align: center;
-        }
-        
-        .hero h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-        
-        .hero p {
-            font-size: 20px;
-            color: #555;
-            max-width: 600px;
-            margin: 0 auto 30px;
-        }
-        
-        .cta-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .btn-cta {
-            padding: 15px 30px;
-            font-size: 18px;
-            border-radius: 30px;
-            text-decoration: none;
-            transition: all 0.3s;
-            font-weight: 600;
-        }
-        
-        .btn-cta-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .btn-cta-secondary {
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
-        }
-        
-        .btn-cta:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
-        /* Features Section */
-        .features {
-            padding: 80px 20px;
-            background: white;
+            min-height: 100vh;
+            padding: 2rem;
         }
         
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        h2 {
-            text-align: center;
-            font-size: 36px;
-            margin-bottom: 50px;
-            color: #2c3e50;
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-        }
-        
-        .feature {
-            text-align: center;
-            padding: 30px;
-            border-radius: 10px;
-            transition: transform 0.3s;
-        }
-        
-        .feature:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        
-        .feature i {
-            font-size: 48px;
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-        
-        .feature h3 {
-            font-size: 24px;
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-        
-        .feature p {
-            color: #666;
-            line-height: 1.8;
-        }
-        
-        /* How It Works */
-        .how-it-works {
-            padding: 80px 20px;
-            background: #f8f9fa;
-        }
-        
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-top: 50px;
-        }
-        
-        .step {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .step-number {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin: 0 auto 20px;
-        }
-        
-        /* About Section */
-        .about {
-            padding: 80px 20px;
-            background: white;
-        }
-        
-        .about-content {
             max-width: 800px;
             margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            color: #333;
             text-align: center;
+            margin-bottom: 2rem;
         }
         
-        .about-content p {
-            font-size: 18px;
-            line-height: 1.8;
-            color: #666;
-            margin-bottom: 20px;
-        }
-        
-        /* Demo Section */
-        .demo {
-            padding: 80px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-align: center;
-        }
-        
-        .demo h2 {
-            color: white;
-            margin-bottom: 30px;
-        }
-        
-        .video-container {
-            max-width: 800px;
-            margin: 0 auto;
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
+        .status {
+            padding: 1rem;
             border-radius: 10px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        
-        .video-placeholder {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-        
-        .video-placeholder i {
-            font-size: 72px;
-            margin-bottom: 20px;
-            opacity: 0.8;
-        }
-        
-        /* Footer */
-        footer {
-            background: #2c3e50;
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-        }
-        
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .footer-links a {
-            color: white;
-            text-decoration: none;
-            font-size: 16px;
-            transition: opacity 0.3s;
-        }
-        
-        .footer-links a:hover {
-            opacity: 0.8;
-            text-decoration: underline;
-        }
-        
-        .copyright {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.2);
-            color: #aaa;
-        }
-        
-        /* Dashboard Preview */
-        .dashboard-preview {
-            padding: 80px 20px;
-            background: #f8f9fa;
-        }
-        
-        .dashboard-img {
-            max-width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-            margin: 40px auto;
-            display: block;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            nav ul {
-                display: none;
-            }
-            
-            .hero h1 {
-                font-size: 32px;
-            }
-            
-            .hero p {
-                font-size: 18px;
-            }
-            
-            .cta-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn-cta {
-                width: 250px;
-            }
-        }
-        
-        /* Dashboard Section */
-        .dashboard-section {
-            display: none;
-            padding: 40px 20px;
-            background: white;
-            min-height: calc(100vh - 70px);
-            margin-top: 70px;
-        }
-        
-        .dashboard-section.active {
-            display: block;
-        }
-        
-        .dashboard-container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        
-        .dashboard-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        
-        .account-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .account-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            color: #667eea;
-        }
-        
-        .upload-section {
-            background: #f8f9fa;
-            padding: 40px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        
-        .upload-area {
-            border: 3px dashed #667eea;
-            border-radius: 10px;
-            padding: 60px 20px;
-            margin: 20px 0;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .upload-area:hover {
-            background: white;
-            border-color: #764ba2;
-        }
-        
-        .upload-area.dragging {
-            background: #f0f0ff;
-            border-color: #764ba2;
-        }
-        
-        .status-message {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
+            margin: 1rem 0;
             display: none;
         }
         
-        .status-message.success {
+        .status.success {
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
             display: block;
         }
         
-        .status-message.error {
+        .status.error {
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
             display: block;
         }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .user-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        
+        .user-info img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-section {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <nav>
-            <div class="logo" style="cursor: pointer;" onclick="showLandingPage()">
-                <i class="fas fa-music"></i>
-                Pianorama Publish
-            </div>
-            <ul>
-                <li><a href="#features">Features</a></li>
-                <li><a href="#how-it-works">How It Works</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#demo">Demo</a></li>
-                <li><a href="privacy.html" target="_blank">Privacy Policy</a></li>
-                <li><a href="terms.html" target="_blank">Terms of Service</a></li>
-                <li><a href="#dashboard" class="btn-primary" onclick="showDashboard()">Dashboard</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <!-- Landing Page -->
-    <div id="landing-page">
-        <!-- Hero Section -->
-        <section class="hero">
-            <h1>Manage Your Social Media Content Like a Pro</h1>
-            <p>Pianorama Publish helps creators schedule, manage, and publish video content across multiple social media platforms with ease.</p>
-            <div class="cta-buttons">
-                <a href="#dashboard" class="btn-cta btn-cta-primary" onclick="showDashboard()">Get Started</a>
-                <a href="#demo" class="btn-cta btn-cta-secondary">Watch Demo</a>
-            </div>
-        </section>
-
-        <!-- Features Section -->
-        <section id="features" class="features">
-            <div class="container">
-                <h2>Powerful Features for Content Creators</h2>
-                <div class="features-grid">
-                    <div class="feature">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <h3>Easy Upload</h3>
-                        <p>Upload your videos with a simple drag-and-drop interface. Support for all major video formats including MP4, MOV, and AVI.</p>
-                    </div>
-                    <div class="feature">
-                        <i class="fas fa-calendar-alt"></i>
-                        <h3>Smart Scheduling</h3>
-                        <p>Schedule your content to be published at optimal times when your audience is most active.</p>
-                    </div>
-                    <div class="feature">
-                        <i class="fas fa-chart-line"></i>
-                        <h3>Analytics Dashboard</h3>
-                        <p>Track your content performance with detailed analytics and insights to grow your audience.</p>
-                    </div>
-                    <div class="feature">
-                        <i class="fas fa-users"></i>
-                        <h3>Multi-Account Support</h3>
-                        <p>Manage multiple social media accounts from one centralized dashboard.</p>
-                    </div>
-                    <div class="feature">
-                        <i class="fas fa-lock"></i>
-                        <h3>Privacy Controls</h3>
-                        <p>Full control over your content visibility with private, friends-only, or public publishing options.</p>
-                    </div>
-                    <div class="feature">
-                        <i class="fas fa-magic"></i>
-                        <h3>Auto-Optimization</h3>
-                        <p>Automatically optimize your videos for each platform's requirements and best practices.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- How It Works -->
-        <section id="how-it-works" class="how-it-works">
-            <div class="container">
-                <h2>How It Works</h2>
-                <div class="steps">
-                    <div class="step">
-                        <div class="step-number">1</div>
-                        <h3>Connect Your Account</h3>
-                        <p>Securely connect your social media accounts using OAuth 2.0 authentication.</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">2</div>
-                        <h3>Upload Content</h3>
-                        <p>Upload your videos or create content directly in our editor.</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">3</div>
-                        <h3>Customize Settings</h3>
-                        <p>Add captions, hashtags, and choose privacy settings for your content.</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">4</div>
-                        <h3>Publish or Schedule</h3>
-                        <p>Publish immediately or schedule for the perfect time to reach your audience.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- About Section -->
-        <section id="about" class="about">
-            <div class="container">
-                <h2>About Pianorama Publish</h2>
-                <div class="about-content">
-                    <p>Pianorama Publish is a comprehensive content management platform designed specifically for social media creators, influencers, and businesses looking to streamline their content publishing workflow.</p>
-                    <p>Our platform integrates seamlessly with major social media platforms, allowing you to manage all your content from one centralized dashboard. Whether you're a solo creator or managing multiple brand accounts, we provide the tools you need to succeed.</p>
-                    <p>Founded in 2024, we're committed to helping creators save time, grow their audience, and focus on what they do best - creating amazing content.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Demo Section -->
-        <section id="demo" class="demo">
-            <div class="container">
-                <h2>See Pianorama Publish in Action</h2>
-                <div class="video-container">
-                    <div class="video-placeholder">
-                        <i class="fas fa-play-circle"></i>
-                        <p>Demo video showing complete integration with social media platforms</p>
-                        <p style="margin-top: 20px; font-size: 14px;">
-                            Watch how easy it is to connect your account, upload content, and publish directly to your social media profiles.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Dashboard Preview -->
-        <section class="dashboard-preview">
-            <div class="container">
-                <h2>Intuitive Dashboard Interface</h2>
-                <p style="text-align: center; color: #666; font-size: 18px; margin-bottom: 40px;">
-                    Manage all your content from our clean and intuitive dashboard
-                </p>
-                <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
-                        <i class="fas fa-desktop" style="font-size: 48px; color: #667eea; margin-bottom: 20px;"></i>
-                        <h3>Dashboard Features</h3>
-                        <ul style="list-style: none; padding: 0; margin: 20px 0;">
-                            <li style="padding: 10px;">✓ Real-time content status</li>
-                            <li style="padding: 10px;">✓ Drag & drop upload</li>
-                            <li style="padding: 10px;">✓ Quick publish options</li>
-                            <li style="padding: 10px;">✓ Account management</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Footer -->
-        <footer>
-            <div class="footer-content">
-                <div class="footer-links">
-                    <a href="privacy.html">Privacy Policy</a>
-                    <a href="terms.html">Terms of Service</a>
-                    <a href="mailto:support@contentstudiopro.com">Contact Support</a>
-                    <a href="#about">About Us</a>
-                </div>
-                <div class="copyright">
-                    <p>&copy; 2025 Pianorama Publish. All rights reserved.</p>
-                    <p>A product by Pianorama SAS</p>
-                </div>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Dashboard Section (Hidden by default) -->
-    <div id="dashboard" class="dashboard-section">
-        <div class="dashboard-container">
-            <div class="dashboard-header">
-                <div class="account-info">
-                    <div class="account-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div>
-                        <h2 id="username">Not Connected</h2>
-                        <div id="accountStatus">
-                            <p>Connect your TikTok account to start publishing</p>
-                        </div>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-cta btn-cta-secondary" onclick="showLandingPage()">
-                        <i class="fas fa-home"></i> Back to Home
-                    </button>
-                    <button id="disconnectBtn" class="btn-cta" style="background: #dc3545; color: white; display: none;" onclick="disconnect()">
-                        <i class="fas fa-sign-out-alt"></i> Disconnect
-                    </button>
-                </div>
-            </div>
-
-            <div class="upload-section">
-                <h3>📤 Publish New Content to TikTok</h3>
-                
-                <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4caf50;">
-                    <h4 style="margin-top: 0; color: #2e7d32;">TikTok Direct Post API Integration</h4>
-                    <p>Upload and publish videos directly to your TikTok account with full control over privacy and interaction settings.</p>
-                </div>
-                
-                <!-- Video Upload Area -->
-                <div class="upload-area" id="uploadArea">
-                    <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #667eea; margin-bottom: 20px;"></i>
-                    <h4>Drag & Drop Your Video Here</h4>
-                    <p>or click to browse (MP4, MOV supported)</p>
-                    <input type="file" id="fileInput" accept="video/*" style="display: none;">
-                </div>
-                
-                <!-- Video Preview -->
-                <div id="videoPreview" style="display: none; margin: 20px 0;">
-                    <h4>📹 Video Preview</h4>
-                    <video id="previewVideo" controls style="width: 100%; max-width: 500px; border-radius: 8px;"></video>
-                </div>
-                
-                <div id="fileInfo" style="display: none; margin: 20px 0; background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                    <p><strong>Selected:</strong> <span id="fileName"></span></p>
-                    <p><strong>Size:</strong> <span id="fileSize"></span></p>
-                </div>
-
-                <!-- TikTok Required Fields -->
-                <div id="postSettings" style="display: none; background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                    <h4 style="margin-top: 0;">📝 Post Settings (Required by TikTok)</h4>
-                    
-                    <!-- Title/Caption -->
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Title/Caption *</label>
-                        <textarea id="postTitle" placeholder="Enter your video caption..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px;"></textarea>
-                    </div>
-                    
-                    <!-- Privacy Level (REQUIRED) -->
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Privacy Level * (Select manually - no default)</label>
-                        <select id="privacyLevel" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                            <option value="">-- Select Privacy Level --</option>
-                            <option value="SELF_ONLY">🔒 Private (Only Me)</option>
-                            <option value="FRIENDS">👥 Friends Only</option>
-                            <option value="PUBLIC">🌍 Public (Everyone)</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Interaction Settings -->
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 10px; font-weight: bold;">Interaction Settings (Check to enable)</label>
-                        <div style="padding-left: 10px;">
-                            <label style="display: block; margin: 5px 0;">
-                                <input type="checkbox" id="allowComments"> Allow Comments
-                            </label>
-                            <label style="display: block; margin: 5px 0;">
-                                <input type="checkbox" id="allowDuet"> Allow Duet
-                            </label>
-                            <label style="display: block; margin: 5px 0;">
-                                <input type="checkbox" id="allowStitch"> Allow Stitch
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <!-- Commercial Content Disclosure -->
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 10px; font-weight: bold;">
-                            <input type="checkbox" id="commercialContent" onchange="toggleCommercialOptions()">
-                            This content promotes a brand, product, or service
-                        </label>
-                        <div id="commercialOptions" style="display: none; padding-left: 20px; margin-top: 10px;">
-                            <label style="display: block; margin: 5px 0;">
-                                <input type="checkbox" id="yourBrand"> Your Brand (promoting yourself/your business)
-                            </label>
-                            <label style="display: block; margin: 5px 0;">
-                                <input type="checkbox" id="brandedContent"> Branded Content (promoting third party)
-                            </label>
-                            <p id="commercialWarning" style="color: #f39c12; font-size: 14px; margin-top: 10px;"></p>
-                        </div>
-                    </div>
-                    
-                    <!-- TikTok Agreement (REQUIRED) -->
-                    <div style="background: #fff3cd; padding: 15px; border-radius: 5px; border-left: 4px solid #ffc107; margin: 20px 0;">
-                        <label style="font-weight: bold;">
-                            <input type="checkbox" id="tiktokAgreement" style="margin-right: 10px;">
-                            <span id="agreementText">By posting, you agree to TikTok's Music Usage Confirmation</span>
-                        </label>
-                    </div>
-                    
-                    <!-- Processing Notice -->
-                    <div style="background: #d1ecf1; padding: 15px; border-radius: 5px; border: 1px solid #bee5eb; margin: 15px 0;">
-                        <p style="margin: 0; color: #0c5460;">
-                            <strong>Note:</strong> After publishing, it may take a few minutes for your content to process and appear on your TikTok profile.
-                        </p>
-                    </div>
-                </div>
-
-                <button id="connectBtn" class="btn-cta btn-cta-primary" style="margin: 20px auto;" onclick="connectAccount()">
-                    <i class="fas fa-link"></i> Connect TikTok Account
-                </button>
-
-                <button id="publishBtn" class="btn-cta btn-cta-primary" style="display: none; margin: 20px auto;" onclick="publishContent()" disabled>
-                    <i class="fas fa-upload"></i> Publish to TikTok
-                </button>
-
-                <div class="status-message" id="statusMessage"></div>
+    <div class="container">
+        <h1>🎵 Pianorama Publish</h1>
+        
+        <!-- Status Messages -->
+        <div id="statusMessage" class="status"></div>
+        
+        <!-- Not Connected -->
+        <div id="notConnected">
+            <h2>Connect to TikTok</h2>
+            <p style="margin: 1rem 0;">Connect your TikTok account to start publishing videos directly from our platform.</p>
+            
+            <button onclick="connectTikTok()" class="btn">
+                <i class="fab fa-tiktok"></i> Connect with TikTok
+            </button>
+            
+            <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 10px;">
+                <h4>What we'll access:</h4>
+                <ul style="list-style: none; padding: 0;">
+                    <li>✓ Your profile information</li>
+                    <li>✓ Ability to publish videos</li>
+                </ul>
             </div>
         </div>
+        
+        <!-- Connected -->
+        <div id="connected" class="hidden">
+            <h2>Connected to TikTok</h2>
+            
+            <div id="userInfo" class="user-info">
+                <div class="spinner"></div>
+                <p>Loading user info...</p>
+            </div>
+            
+            <div class="upload-section">
+                <h3>📹 Publish Video</h3>
+                <input type="text" id="videoTitle" placeholder="Video title" style="width: 100%; padding: 0.5rem; margin: 1rem 0;">
+                <input type="text" id="videoUrl" placeholder="Video URL" style="width: 100%; padding: 0.5rem; margin: 1rem 0;">
+                <select id="privacyLevel" style="width: 100%; padding: 0.5rem; margin: 1rem 0;">
+                    <option value="SELF_ONLY">Private (Only me)</option>
+                    <option value="MUTUAL_FOLLOW_FRIENDS">Friends</option>
+                    <option value="PUBLIC_TO_EVERYONE">Public</option>
+                </select>
+                <button onclick="publishVideo()" class="btn">
+                    <i class="fas fa-upload"></i> Publish to TikTok
+                </button>
+            </div>
+            
+            <button onclick="disconnect()" class="btn" style="background: #dc3545;">
+                <i class="fas fa-sign-out-alt"></i> Disconnect
+            </button>
+        </div>
     </div>
-
+    
     <script>
-        // Configuration
-        const CLIENT_KEY = "sbaw9sck9i4u94jbyw";
-        const REDIRECT_URI = "https://iliaskalalou.github.io/Pianorama_publish";
+        // Configuration - À METTRE À JOUR après déploiement
+        const BACKEND_URL = 'https://purple-imaginative-mercy-production.up.railway.app';
+        let accessToken = null;
         
-        let isConnected = false;
-        let selectedFile = null;
-        let currentAccount = null;
-
-        // Check OAuth callback
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        
-        if (code) {
-            // Handle OAuth callback
-            localStorage.setItem('oauth_code', code);
-            localStorage.setItem('connected', 'true');
-            const username = '@creator_' + Math.floor(Math.random() * 1000);
-            localStorage.setItem('username', username);
+        // Check URL parameters on load
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const success = urlParams.get('success');
+            const error = urlParams.get('error');
             
-            // Store account info
-            currentAccount = {
-                username: username,
-                display_name: username,
-                oauth_code: code,
-                connected_at: new Date().toISOString()
-            };
-            localStorage.setItem('tiktok_account', JSON.stringify(currentAccount));
-            
-            window.history.replaceState({}, document.title, window.location.pathname);
-            showDashboard();
-            showStatus('success', 'Successfully connected to TikTok account!');
-        }
-
-        // Check if already connected
-        if (localStorage.getItem('connected') === 'true') {
-            isConnected = true;
-            const savedAccount = localStorage.getItem('tiktok_account');
-            if (savedAccount) {
-                currentAccount = JSON.parse(savedAccount);
-            }
-        }
-
-        function showLandingPage() {
-            document.getElementById('landing-page').style.display = 'block';
-            document.getElementById('dashboard').classList.remove('active');
-            window.scrollTo(0, 0);
-        }
-
-        function showDashboard() {
-            document.getElementById('landing-page').style.display = 'none';
-            document.getElementById('dashboard').classList.add('active');
-            
-            if (isConnected && currentAccount) {
-                document.getElementById('username').textContent = currentAccount.username || '@content_creator';
-                document.getElementById('connectBtn').style.display = 'none';
-                document.getElementById('publishBtn').style.display = 'block';
-                document.getElementById('disconnectBtn').style.display = 'block';
-                document.getElementById('accountStatus').innerHTML = `
-                    <p style="color: #28a745; font-weight: bold;">✅ Connected to TikTok</p>
-                    <p style="font-size: 14px;">Account: ${currentAccount.username}</p>
-                    <p style="font-size: 12px; color: #666;">Ready to publish content</p>
-                `;
+            if (token && success === 'true') {
+                // OAuth successful
+                accessToken = token;
+                localStorage.setItem('tiktok_token', token);
+                showStatus('success', 'Successfully connected to TikTok!');
+                showConnected();
+                loadUserInfo();
                 
-                // Show post settings if file is selected
-                if (selectedFile) {
-                    document.getElementById('postSettings').style.display = 'block';
-                }
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else if (error) {
+                showStatus('error', `Authentication failed: ${error}`);
             } else {
-                document.getElementById('username').textContent = 'Not Connected';
-                document.getElementById('connectBtn').style.display = 'block';
-                document.getElementById('publishBtn').style.display = 'none';
-                document.getElementById('disconnectBtn').style.display = 'none';
-                document.getElementById('postSettings').style.display = 'none';
-                document.getElementById('accountStatus').innerHTML = `
-                    <p style="color: #dc3545;">❌ Not connected to TikTok</p>
-                    <p style="font-size: 14px;">Click "Connect TikTok Account" to get started</p>
-                `;
+                // Check if already connected
+                const savedToken = localStorage.getItem('tiktok_token');
+                if (savedToken) {
+                    accessToken = savedToken;
+                    showConnected();
+                    loadUserInfo();
+                }
+            }
+        });
+        
+        function connectTikTok() {
+            // Redirect to backend OAuth endpoint
+            window.location.href = `${BACKEND_URL}/auth`;
+        }
+        
+        function showConnected() {
+            document.getElementById('notConnected').classList.add('hidden');
+            document.getElementById('connected').classList.remove('hidden');
+        }
+        
+        function showNotConnected() {
+            document.getElementById('connected').classList.add('hidden');
+            document.getElementById('notConnected').classList.remove('hidden');
+        }
+        
+        async function loadUserInfo() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/user-info`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const user = await response.json();
+                    document.getElementById('userInfo').innerHTML = `
+                        <img src="${user.avatar_url || 'https://via.placeholder.com/80'}" alt="Avatar">
+                        <h3>${user.display_name || 'TikTok User'}</h3>
+                        <p>@${user.username || 'username'}</p>
+                    `;
+                } else {
+                    document.getElementById('userInfo').innerHTML = '<p>Could not load user info</p>';
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+                document.getElementById('userInfo').innerHTML = '<p>Error loading user info</p>';
             }
         }
-
-        function connectAccount() {
-            // Build OAuth URL with TikTok
-            const authUrl = `https://www.tiktok.com/v2/auth/authorize/?` +
-                `client_key=${CLIENT_KEY}&` +
-                `response_type=code&` +
-                `scope=user.info.basic,video.publish&` +
-                `redirect_uri=${encodeURIComponent(REDIRECT_URI)}&` +
-                `state=dashboard`;
+        
+        async function publishVideo() {
+            const title = document.getElementById('videoTitle').value;
+            const videoUrl = document.getElementById('videoUrl').value;
+            const privacy = document.getElementById('privacyLevel').value;
             
-            showStatus('info', '🔗 Redirecting to TikTok for authentication...');
+            if (!title || !videoUrl) {
+                showStatus('error', 'Please provide video title and URL');
+                return;
+            }
             
-            // Show OAuth instructions before redirect
-            const confirmRedirect = confirm(
-                'You will be redirected to TikTok to authorize Pianorama Publish.\n\n' +
-                '1. Log in with your TikTok account\n' +
-                '2. Authorize the application\n' +
-                '3. You will be redirected back here\n\n' +
-                'Click OK to continue.'
-            );
+            showStatus('info', 'Publishing video to TikTok...');
             
-            if (confirmRedirect) {
-                setTimeout(() => {
-                    window.location.href = authUrl;
-                }, 1000);
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/publish`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        video_url: videoUrl,
+                        privacy: privacy
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showStatus('success', result.message || 'Video published successfully!');
+                    
+                    // Clear form
+                    document.getElementById('videoTitle').value = '';
+                    document.getElementById('videoUrl').value = '';
+                } else {
+                    showStatus('error', 'Failed to publish video');
+                }
+            } catch (error) {
+                console.error('Error publishing:', error);
+                showStatus('error', 'Error publishing video');
             }
         }
         
         function disconnect() {
-            if (confirm('Are you sure you want to disconnect your TikTok account?')) {
-                localStorage.removeItem('oauth_code');
-                localStorage.removeItem('connected');
-                localStorage.removeItem('username');
-                localStorage.removeItem('tiktok_account');
-                isConnected = false;
-                currentAccount = null;
-                showDashboard();
-                showStatus('info', 'Disconnected from TikTok account');
-            }
-        }
-
-        // File upload handling
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
-        });
-        
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragging');
-        });
-        
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragging');
-        });
-        
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragging');
-            handleFile(e.dataTransfer.files[0]);
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFile(e.target.files[0]);
-            }
-        });
-        
-        function handleFile(file) {
-            if (!file || !file.type.startsWith('video/')) {
-                showStatus('error', 'Please select a valid video file');
-                return;
-            }
-            
-            selectedFile = file;
-            document.getElementById('fileName').textContent = file.name;
-            document.getElementById('fileSize').textContent = formatFileSize(file.size);
-            document.getElementById('fileInfo').style.display = 'block';
-            
-            // Show video preview
-            const videoPreview = document.getElementById('videoPreview');
-            const previewVideo = document.getElementById('previewVideo');
-            const fileURL = URL.createObjectURL(file);
-            previewVideo.src = fileURL;
-            videoPreview.style.display = 'block';
-            
-            // Show post settings if connected
-            if (isConnected) {
-                document.getElementById('postSettings').style.display = 'block';
-                validatePublishButton();
-            }
-            
-            showStatus('success', `Video selected: ${file.name}`);
-        }
-        
-        function toggleCommercialOptions() {
-            const isChecked = document.getElementById('commercialContent').checked;
-            const options = document.getElementById('commercialOptions');
-            options.style.display = isChecked ? 'block' : 'none';
-            
-            if (isChecked) {
-                updateCommercialWarning();
-            }
-            updateAgreementText();
-        }
-        
-        function updateCommercialWarning() {
-            const yourBrand = document.getElementById('yourBrand').checked;
-            const brandedContent = document.getElementById('brandedContent').checked;
-            const warning = document.getElementById('commercialWarning');
-            
-            if (yourBrand && !brandedContent) {
-                warning.textContent = 'Your video will be labeled as "Promotional content"';
-            } else if (brandedContent) {
-                warning.textContent = 'Your video will be labeled as "Paid partnership"';
-                // Check privacy level
-                const privacy = document.getElementById('privacyLevel').value;
-                if (privacy === 'SELF_ONLY') {
-                    warning.textContent += ' (Note: Branded content cannot be private)';
-                }
-            } else {
-                warning.textContent = '';
-            }
-        }
-        
-        function updateAgreementText() {
-            const brandedContent = document.getElementById('brandedContent').checked;
-            const agreementText = document.getElementById('agreementText');
-            
-            if (brandedContent) {
-                agreementText.textContent = "By posting, you agree to TikTok's Branded Content Policy and Music Usage Confirmation";
-            } else {
-                agreementText.textContent = "By posting, you agree to TikTok's Music Usage Confirmation";
-            }
-        }
-        
-        function validatePublishButton() {
-            if (!isConnected || !selectedFile) {
-                document.getElementById('publishBtn').disabled = true;
-                return;
-            }
-            
-            const title = document.getElementById('postTitle').value;
-            const privacy = document.getElementById('privacyLevel').value;
-            const agreement = document.getElementById('tiktokAgreement').checked;
-            const commercialToggle = document.getElementById('commercialContent').checked;
-            
-            let commercialValid = true;
-            if (commercialToggle) {
-                const yourBrand = document.getElementById('yourBrand').checked;
-                const brandedContent = document.getElementById('brandedContent').checked;
-                commercialValid = yourBrand || brandedContent;
-            }
-            
-            const isValid = title && privacy && agreement && commercialValid;
-            document.getElementById('publishBtn').disabled = !isValid;
-            
-            if (!isValid && selectedFile) {
-                let missing = [];
-                if (!title) missing.push('Title/Caption');
-                if (!privacy) missing.push('Privacy Level');
-                if (!agreement) missing.push('TikTok Agreement');
-                if (commercialToggle && !commercialValid) missing.push('Commercial content type');
-                
-                if (missing.length > 0) {
-                    showStatus('info', `Please complete: ${missing.join(', ')}`);
-                }
-            }
-        }
-        
-        // Add event listeners for validation
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('postTitle').addEventListener('input', validatePublishButton);
-            document.getElementById('privacyLevel').addEventListener('change', function() {
-                validatePublishButton();
-                updateCommercialWarning();
-            });
-            document.getElementById('tiktokAgreement').addEventListener('change', validatePublishButton);
-            document.getElementById('yourBrand').addEventListener('change', function() {
-                updateCommercialWarning();
-                validatePublishButton();
-            });
-            document.getElementById('brandedContent').addEventListener('change', function() {
-                updateCommercialWarning();
-                updateAgreementText();
-                validatePublishButton();
-            });
-        });
-        
-        function formatFileSize(bytes) {
-            if (bytes < 1024) return bytes + ' B';
-            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-        }
-        
-        function publishContent() {
-            if (!selectedFile || !isConnected) {
-                return;
-            }
-            
-            // Get all values
-            const title = document.getElementById('postTitle').value;
-            const privacy = document.getElementById('privacyLevel').value;
-            const allowComments = document.getElementById('allowComments').checked;
-            const allowDuet = document.getElementById('allowDuet').checked;
-            const allowStitch = document.getElementById('allowStitch').checked;
-            
-            const publishBtn = document.getElementById('publishBtn');
-            publishBtn.disabled = true;
-            publishBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing to TikTok...';
-            
-            showStatus('info', `📤 Uploading "${selectedFile.name}" to TikTok...`);
-            
-            // Simulate publishing process with steps
-            setTimeout(() => {
-                showStatus('info', `🔄 Setting privacy to ${privacy}...`);
-                
-                setTimeout(() => {
-                    const interactions = [];
-                    if (allowComments) interactions.push('Comments');
-                    if (allowDuet) interactions.push('Duet');
-                    if (allowStitch) interactions.push('Stitch');
-                    
-                    showStatus('info', `⚙️ Configuring interactions: ${interactions.join(', ') || 'None'}...`);
-                    
-                    setTimeout(() => {
-                        showStatus('success', `✅ Video published successfully to TikTok!
-                        
-Account: ${currentAccount?.username || '@your_account'}
-Privacy: ${privacy.replace('_', ' ')}
-Title: "${title}"
-
-Check your TikTok profile in a few minutes.`);
-                        
-                        publishBtn.disabled = false;
-                        publishBtn.innerHTML = '<i class="fas fa-upload"></i> Publish Another Video';
-                        
-                        // Reset form
-                        selectedFile = null;
-                        document.getElementById('fileInfo').style.display = 'none';
-                        document.getElementById('videoPreview').style.display = 'none';
-                        document.getElementById('postSettings').style.display = 'none';
-                        document.getElementById('postTitle').value = '';
-                        document.getElementById('privacyLevel').value = '';
-                        document.getElementById('tiktokAgreement').checked = false;
-                        fileInput.value = '';
-                    }, 2000);
-                }, 1500);
-            }, 1500);
+            localStorage.removeItem('tiktok_token');
+            accessToken = null;
+            showNotConnected();
+            showStatus('info', 'Disconnected from TikTok');
         }
         
         function showStatus(type, message) {
             const statusEl = document.getElementById('statusMessage');
-            statusEl.className = 'status-message ' + type;
+            statusEl.className = 'status ' + type;
             statusEl.textContent = message;
             statusEl.style.display = 'block';
             
-            if (type === 'success' || type === 'error') {
+            if (type !== 'error') {
                 setTimeout(() => {
                     statusEl.style.display = 'none';
                 }, 5000);
             }
         }
-        
-        // Smooth scroll for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target && this.getAttribute('href') !== '#dashboard') {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
     </script>
 </body>
 </html>
