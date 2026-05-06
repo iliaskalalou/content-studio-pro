@@ -13,12 +13,19 @@ from urllib.parse import urlencode
 app = Flask(__name__)
 CORS(app, origins=["https://iliaskalalou.github.io", "http://localhost:*"])
 
-# Configuration TikTok (utilisez des variables d'environnement en production)
-CLIENT_KEY = os.environ.get("TIKTOK_CLIENT_KEY", "sbaw9sck9i4u94jbyw")
-CLIENT_SECRET = os.environ.get("TIKTOK_CLIENT_SECRET", "Iwl5nMhrxo3S5xUfixLam6Ha74DR19am")
+# TikTok configuration. Read everything from environment variables; the
+# secret must never be hardcoded into a file that gets committed.
+CLIENT_KEY = os.environ.get("TIKTOK_CLIENT_KEY")
+CLIENT_SECRET = os.environ.get("TIKTOK_CLIENT_SECRET")
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://iliaskalalou.github.io/Pianorama_publish")
-BACKEND_URL = os.environ.get("BACKEND_URL", "https://your-app.railway.app")  # À remplacer
+BACKEND_URL = os.environ.get("BACKEND_URL", "https://your-app.railway.app")
 REDIRECT_URI = f"{BACKEND_URL}/callback"
+
+if not CLIENT_KEY or not CLIENT_SECRET:
+    raise RuntimeError(
+        "TIKTOK_CLIENT_KEY and TIKTOK_CLIENT_SECRET must be set in the environment "
+        "(e.g. via Railway / Render / Heroku config or a local .env file)."
+    )
 
 @app.route('/')
 def home():
