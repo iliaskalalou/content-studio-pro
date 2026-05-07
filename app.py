@@ -27,11 +27,15 @@ if not CLIENT_KEY or not CLIENT_SECRET:
         "(e.g. via Railway / Render / Heroku config or a local .env file)."
     )
 
+VERSION = "v2-2026-05-07"
+
+
 @app.route('/')
 def home():
     """API home page."""
     return jsonify({
         "status": "online",
+        "version": VERSION,
         "service": "Pianorama Publish TikTok OAuth Backend",
         "endpoints": {
             "/auth": "Initiate OAuth flow",
