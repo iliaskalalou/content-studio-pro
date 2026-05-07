@@ -60,67 +60,76 @@ def auth():
 
 @app.route('/callback')
 def callback():
-    """Callback OAuth - reçoit le code et redirige vers le frontend avec le token"""
+    """OAuth callback. Receives the auth code, exchanges it for an access
+    token via TikTok's V2 token endpoint, then redirects back to the
+    frontend with the token in the URL."""
     code = request.args.get('code')
     error = request.args.get('error')
-    
+
     if error:
-        # Rediriger vers le frontend avec l'erreur
         return redirect(f"{FRONTEND_URL}?error={error}")
-    
     if not code:
         return redirect(f"{FRONTEND_URL}?error=no_code")
-    
-    # Échanger le code contre un token
-    token_url = "https://open-api.tiktok.com/oauth/access_token/"
-    
+
+    # V2 OAuth token endpoint. Must match the V2 auth URL used in /auth.
+    token_url = "https://open.tiktokapis.com/v2/oauth/token/"
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cache-Control": "no-cache",
+    }
     data = {
         "client_key": CLIENT_KEY,
         "client_secret": CLIENT_SECRET,
         "code": code,
         "grant_type": "authorization_code",
-        "redirect_uri": REDIRECT_URI
+        "redirect_uri": REDIRECT_URI,
     }
-    
+
     try:
-        response = requests.post(token_url, data=data)
+        response = requests.post(token_url, data=data, headers=headers, timeout=10)
         result = response.json()
-        
-        if response.status_code == 200 and "data" in result:
-            access_token = result["data"].get("access_token")
-            if access_token:
-                # Rediriger vers le frontend avec le token
-                # En production, utilisez un token temporaire ou JWT
-                return redirect(f"{FRONTEND_URL}?token={access_token}&success=true")
-        
-        return redirect(f"{FRONTEND_URL}?error=token_exchange_failed")
-        
     except Exception as e:
+        app.logger.error(f"Token exchange request failed: {e}")
         return redirect(f"{FRONTEND_URL}?error=server_error")
+
+    # V2 response: access_token is at the top level, not under "data".
+    access_token = result.get("access_token")
+    if response.status_code == 200 and access_token:
+        return redirect(f"{FRONTEND_URL}?token={access_token}&success=true")
+
+    # Log the actual TikTok error to make future debugging possible.
+    app.logger.error(
+        f"Token exchange failed (status {response.status_code}): {result}"
+    )
+    err_code = result.get("error", "token_exchange_failed")
+    return redirect(f"{FRONTEND_URL}?error={err_code}")
 
 @app.route('/api/user-info')
 def get_user_info():
-    """Récupère les informations utilisateur TikTok"""
+    """Fetch TikTok user info via the V2 endpoint. The fields parameter is
+    mandatory in V2 — without it the API returns an error."""
     auth_header = request.headers.get('Authorization')
     if not auth_header or not auth_header.startswith('Bearer '):
         return jsonify({"error": "No token provided"}), 401
-    
+
     token = auth_header.split(' ')[1]
-    
+
     url = "https://open.tiktokapis.com/v2/user/info/"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-    
+    headers = {"Authorization": f"Bearer {token}"}
+    params = {"fields": "open_id,union_id,avatar_url,display_name"}
+
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, params=params, timeout=10)
         if response.status_code == 200:
             result = response.json()
             if result.get("error", {}).get("code") == "ok":
                 return jsonify(result.get("data", {}).get("user", {}))
-        
+            app.logger.error(f"User info API error: {result}")
+            return jsonify({"error": result.get("error", {})}), 400
+        app.logger.error(f"User info HTTP {response.status_code}: {response.text}")
         return jsonify({"error": "Failed to get user info"}), 400
     except Exception as e:
+        app.logger.error(f"User info request failed: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/publish', methods=['POST'])
