@@ -11,6 +11,8 @@ import os
 from urllib.parse import urlencode
 
 app = Flask(__name__)
+# Render's free tier accepts up to ~100 MB request bodies; cap to 100 MB.
+app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024
 CORS(app, origins=["https://iliaskalalou.github.io", "http://localhost:*"])
 
 # TikTok configuration. Read everything from environment variables; the
@@ -27,7 +29,7 @@ if not CLIENT_KEY or not CLIENT_SECRET:
         "(e.g. via Railway / Render / Heroku config or a local .env file)."
     )
 
-VERSION = "v2-2026-05-07"
+VERSION = "v2.1-2026-05-07-real-publish"
 
 
 @app.route('/')
@@ -136,29 +138,120 @@ def get_user_info():
         app.logger.error(f"User info request failed: {e}")
         return jsonify({"error": str(e)}), 500
 
+def _read_token():
+    """Extract the OAuth bearer token from the request headers."""
+    auth_header = request.headers.get('Authorization', '')
+    if not auth_header.startswith('Bearer '):
+        return None
+    return auth_header.split(' ', 1)[1]
+
+
+def _read_video_file():
+    """Return (filename, bytes) for the uploaded video, or None.
+    The frontend can either send the file as multipart/form-data under the
+    'video' key, or fall back to a JSON body during the demo."""
+    if 'video' in request.files:
+        f = request.files['video']
+        return f.filename, f.read()
+    return None, None
+
+
+def _post_to_tiktok(init_url, init_body, file_bytes, token):
+    """Run the TikTok V2 publish flow:
+    1. POST to init_url to obtain an upload_url and publish_id.
+    2. PUT the video bytes to that upload_url.
+    Returns (status_code, response_payload).
+    """
+    init_resp = requests.post(
+        init_url,
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json; charset=UTF-8",
+        },
+        json=init_body,
+        timeout=15,
+    )
+    init_data = init_resp.json()
+    if init_resp.status_code != 200 or init_data.get("error", {}).get("code") not in ("ok", None):
+        app.logger.error(f"TikTok init failed (HTTP {init_resp.status_code}): {init_data}")
+        return init_resp.status_code, init_data
+
+    upload_url = init_data.get("data", {}).get("upload_url")
+    publish_id = init_data.get("data", {}).get("publish_id")
+    if not upload_url:
+        app.logger.error(f"No upload_url returned by TikTok: {init_data}")
+        return 500, {"error": {"code": "no_upload_url", "message": "TikTok did not return an upload URL"}}
+
+    file_size = len(file_bytes)
+    put_resp = requests.put(
+        upload_url,
+        data=file_bytes,
+        headers={
+            "Content-Type": "video/mp4",
+            "Content-Range": f"bytes 0-{file_size - 1}/{file_size}",
+        },
+        timeout=60,
+    )
+    if put_resp.status_code not in (200, 201):
+        app.logger.error(f"TikTok upload PUT failed (HTTP {put_resp.status_code}): {put_resp.text}")
+        return put_resp.status_code, {"error": {"code": "upload_failed", "message": put_resp.text[:500]}}
+
+    return 200, {"publish_id": publish_id}
+
+
 @app.route('/api/publish', methods=['POST'])
 def publish_video():
     """Direct Post: publish a video straight to the user's TikTok profile.
     Uses the video.publish scope. The privacy level chosen by the user is
     applied to the published content."""
-    auth_header = request.headers.get('Authorization')
-    if not auth_header or not auth_header.startswith('Bearer '):
+    token = _read_token()
+    if not token:
         return jsonify({"error": "No token provided"}), 401
 
-    data = request.json or {}
-    title = data.get('title', 'Video from Pianorama Publish')
-    privacy = data.get('privacy', 'SELF_ONLY')
-    video_url = data.get('video_url')
+    title = request.form.get('title', 'Video from Pianorama Publish')
+    privacy = request.form.get('privacy', 'SELF_ONLY')
+    filename, file_bytes = _read_video_file()
+    if not file_bytes:
+        return jsonify({"success": False, "message": "No video file provided"}), 400
 
-    # Real implementation would call POST https://open.tiktokapis.com/v2/post/publish/video/init/
-    # Here we return a success response so the demo flow stays self-contained.
+    init_body = {
+        "post_info": {
+            "title": title,
+            "privacy_level": privacy,
+            "disable_duet": False,
+            "disable_comment": False,
+            "disable_stitch": False,
+            "video_cover_timestamp_ms": 0,
+        },
+        "source_info": {
+            "source": "FILE_UPLOAD",
+            "video_size": len(file_bytes),
+            "chunk_size": len(file_bytes),
+            "total_chunk_count": 1,
+        },
+    }
+
+    status, payload = _post_to_tiktok(
+        "https://open.tiktokapis.com/v2/post/publish/video/init/",
+        init_body, file_bytes, token,
+    )
+
+    if status == 200:
+        return jsonify({
+            "success": True,
+            "mode": "direct_post",
+            "publish_id": payload.get("publish_id"),
+            "filename": filename,
+            "privacy": privacy,
+            "message": f"Video '{title}' was sent to TikTok. In Sandbox the post is private to the connected creator.",
+        })
+
     return jsonify({
-        "success": True,
+        "success": False,
         "mode": "direct_post",
-        "message": f"Video '{title}' published directly to your TikTok profile.",
-        "privacy": privacy,
-        "video_url": video_url
-    })
+        "error": payload.get("error", {}),
+        "message": payload.get("error", {}).get("message", "Direct post failed."),
+    }), status if status != 200 else 500
 
 
 @app.route('/api/upload', methods=['POST'])
@@ -166,21 +259,44 @@ def upload_draft():
     """Upload to TikTok as a draft. Uses the video.upload scope. The video
     lands in the user's TikTok inbox where they can review, edit and finalise
     the post inside the TikTok app."""
-    auth_header = request.headers.get('Authorization')
-    if not auth_header or not auth_header.startswith('Bearer '):
+    token = _read_token()
+    if not token:
         return jsonify({"error": "No token provided"}), 401
 
-    data = request.json or {}
-    title = data.get('title', 'Video from Pianorama Publish')
-    video_url = data.get('video_url')
+    title = request.form.get('title', 'Video from Pianorama Publish')
+    filename, file_bytes = _read_video_file()
+    if not file_bytes:
+        return jsonify({"success": False, "message": "No video file provided"}), 400
 
-    # Real implementation would call POST https://open.tiktokapis.com/v2/post/publish/inbox/video/init/
+    init_body = {
+        "source_info": {
+            "source": "FILE_UPLOAD",
+            "video_size": len(file_bytes),
+            "chunk_size": len(file_bytes),
+            "total_chunk_count": 1,
+        },
+    }
+
+    status, payload = _post_to_tiktok(
+        "https://open.tiktokapis.com/v2/post/publish/inbox/video/init/",
+        init_body, file_bytes, token,
+    )
+
+    if status == 200:
+        return jsonify({
+            "success": True,
+            "mode": "upload_draft",
+            "publish_id": payload.get("publish_id"),
+            "filename": filename,
+            "message": f"Video '{title}' uploaded as a draft. Open your TikTok inbox to finalise the post.",
+        })
+
     return jsonify({
-        "success": True,
+        "success": False,
         "mode": "upload_draft",
-        "message": f"Video '{title}' uploaded as a draft. Review and post it from your TikTok inbox.",
-        "video_url": video_url
-    })
+        "error": payload.get("error", {}),
+        "message": payload.get("error", {}).get("message", "Draft upload failed."),
+    }), status if status != 200 else 500
 
 @app.route('/health')
 def health():

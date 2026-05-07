@@ -626,19 +626,20 @@
             btn.disabled = true;
             const previousLabel = btn.textContent;
             btn.textContent = busyLabel;
+
+            // Send the actual file bytes to the backend so it can call the
+            // real TikTok Content Posting API.
+            const formData = new FormData();
+            formData.append('video', file);
+            formData.append('title', $('#caption').value);
+            formData.append('privacy', privacy || '');
+            formData.append('commercial', $('#commercial').checked ? 'true' : 'false');
+
             try {
                 const resp = await fetch(BACKEND_URL + endpoint, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
-                    },
-                    body: JSON.stringify({
-                        title: $('#caption').value,
-                        privacy,
-                        commercial: $('#commercial').checked,
-                        filename: file.name
-                    })
+                    headers: { 'Authorization': 'Bearer ' + token },
+                    body: formData,
                 });
                 const data = await resp.json();
                 if (resp.ok && data.success) {
