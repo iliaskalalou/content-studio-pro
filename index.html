@@ -645,7 +645,10 @@
                 if (resp.ok && data.success) {
                     showStatus('success', data.message || successMessage);
                 } else {
-                    showStatus('error', data.message || 'Operation failed.');
+                    const code = data.error && data.error.code ? data.error.code : 'unknown_error';
+                    const msg = data.message || 'Operation failed.';
+                    showStatus('error', '[' + code + '] ' + msg);
+                    console.error('TikTok publish error:', data);
                 }
             } catch (err) {
                 showStatus('error', 'Network error. Please try again.');
