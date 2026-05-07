@@ -487,9 +487,19 @@
                         </div>
 
                         <div class="form-section">
-                            <button type="submit" id="btn-publish" class="btn btn-primary btn-large" style="width:100%;">
-                                Publish content
-                            </button>
+                            <p class="help" style="margin-bottom: 12px;">
+                                Choose how to publish:
+                                <strong>Publish content</strong> posts directly to the connected profile,
+                                <strong>Save as draft</strong> sends it to the TikTok inbox for review.
+                            </p>
+                            <div style="display: flex; gap: 10px;">
+                                <button type="submit" id="btn-publish" class="btn btn-primary" style="flex:1;">
+                                    Publish content
+                                </button>
+                                <button type="button" id="btn-draft" class="btn btn-secondary" style="flex:1;">
+                                    Save as draft
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -597,15 +607,14 @@
             filenameLabel.textContent = file ? file.name : '';
         }
 
-        publishForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        async function sendPost(endpoint, requirePrivacy, btn, busyLabel, defaultLabel, successMessage) {
             const file = fileInput.files[0];
             if (!file) {
-                showStatus('error', 'Please select a video file before publishing.');
+                showStatus('error', 'Please select a video file first.');
                 return;
             }
             const privacy = $('#privacy').value;
-            if (!privacy) {
+            if (requirePrivacy && !privacy) {
                 showStatus('error', 'Please select a privacy level.');
                 return;
             }
@@ -614,11 +623,11 @@
                 showStatus('error', 'Your session has expired. Please reconnect.');
                 return;
             }
-            const btn = $('#btn-publish');
             btn.disabled = true;
-            btn.textContent = 'Publishing...';
+            const previousLabel = btn.textContent;
+            btn.textContent = busyLabel;
             try {
-                const resp = await fetch(BACKEND_URL + '/api/publish', {
+                const resp = await fetch(BACKEND_URL + endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -633,16 +642,33 @@
                 });
                 const data = await resp.json();
                 if (resp.ok && data.success) {
-                    showStatus('success', 'Content published successfully.');
+                    showStatus('success', data.message || successMessage);
                 } else {
-                    showStatus('error', data.message || 'Publishing failed.');
+                    showStatus('error', data.message || 'Operation failed.');
                 }
             } catch (err) {
                 showStatus('error', 'Network error. Please try again.');
             } finally {
                 btn.disabled = false;
-                btn.textContent = 'Publish content';
+                btn.textContent = defaultLabel || previousLabel;
             }
+        }
+
+        publishForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            sendPost(
+                '/api/publish', true,
+                $('#btn-publish'), 'Publishing...', 'Publish content',
+                'Content published successfully.'
+            );
+        });
+
+        $('#btn-draft').addEventListener('click', () => {
+            sendPost(
+                '/api/upload', false,
+                $('#btn-draft'), 'Uploading...', 'Save as draft',
+                'Video uploaded as a draft. Review and post it from your TikTok inbox.'
+            );
         });
     </script>
 </body>

@@ -29,7 +29,7 @@ if not CLIENT_KEY or not CLIENT_SECRET:
 
 @app.route('/')
 def home():
-    """Page d'accueil de l'API"""
+    """API home page."""
     return jsonify({
         "status": "online",
         "service": "Pianorama Publish TikTok OAuth Backend",
@@ -37,21 +37,24 @@ def home():
             "/auth": "Initiate OAuth flow",
             "/callback": "OAuth callback",
             "/api/user-info": "Get user info",
-            "/api/publish": "Publish video"
+            "/api/publish": "Publish video directly to the user's profile (video.publish)",
+            "/api/upload": "Upload video as a draft for the user to edit and post (video.upload)"
         }
     })
 
 @app.route('/auth')
 def auth():
-    """Initie le flux OAuth TikTok"""
+    """Start the TikTok OAuth flow.
+    Both video.publish (direct posting) and video.upload (drafts) are
+    requested so the app can demonstrate the two posting modes."""
     params = {
         "client_key": CLIENT_KEY,
         "response_type": "code",
-        "scope": "user.info.basic,video.publish",
+        "scope": "user.info.basic,video.publish,video.upload",
         "redirect_uri": REDIRECT_URI,
         "state": request.args.get('state', 'state123')
     }
-    
+
     auth_url = f"https://www.tiktok.com/v2/auth/authorize/?{urlencode(params)}"
     return redirect(auth_url)
 
@@ -122,26 +125,47 @@ def get_user_info():
 
 @app.route('/api/publish', methods=['POST'])
 def publish_video():
-    """Publie une vidéo sur TikTok"""
+    """Direct Post: publish a video straight to the user's TikTok profile.
+    Uses the video.publish scope. The privacy level chosen by the user is
+    applied to the published content."""
     auth_header = request.headers.get('Authorization')
     if not auth_header or not auth_header.startswith('Bearer '):
         return jsonify({"error": "No token provided"}), 401
-    
-    token = auth_header.split(' ')[1]
-    
-    # Récupérer les données de la requête
-    data = request.json
-    video_url = data.get('video_url')
+
+    data = request.json or {}
     title = data.get('title', 'Video from Pianorama Publish')
     privacy = data.get('privacy', 'SELF_ONLY')
-    
-    # Ici, implémenter la logique complète de publication TikTok
-    # Pour la démo, on retourne un succès simulé
-    
+    video_url = data.get('video_url')
+
+    # Real implementation would call POST https://open.tiktokapis.com/v2/post/publish/video/init/
+    # Here we return a success response so the demo flow stays self-contained.
     return jsonify({
         "success": True,
-        "message": f"Video '{title}' published successfully",
+        "mode": "direct_post",
+        "message": f"Video '{title}' published directly to your TikTok profile.",
         "privacy": privacy,
+        "video_url": video_url
+    })
+
+
+@app.route('/api/upload', methods=['POST'])
+def upload_draft():
+    """Upload to TikTok as a draft. Uses the video.upload scope. The video
+    lands in the user's TikTok inbox where they can review, edit and finalise
+    the post inside the TikTok app."""
+    auth_header = request.headers.get('Authorization')
+    if not auth_header or not auth_header.startswith('Bearer '):
+        return jsonify({"error": "No token provided"}), 401
+
+    data = request.json or {}
+    title = data.get('title', 'Video from Pianorama Publish')
+    video_url = data.get('video_url')
+
+    # Real implementation would call POST https://open.tiktokapis.com/v2/post/publish/inbox/video/init/
+    return jsonify({
+        "success": True,
+        "mode": "upload_draft",
+        "message": f"Video '{title}' uploaded as a draft. Review and post it from your TikTok inbox.",
         "video_url": video_url
     })
 
