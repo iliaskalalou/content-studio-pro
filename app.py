@@ -19,8 +19,8 @@ CORS(app, origins=["https://iliaskalalou.github.io", "http://localhost:*"])
 # secret must never be hardcoded into a file that gets committed.
 CLIENT_KEY = os.environ.get("TIKTOK_CLIENT_KEY")
 CLIENT_SECRET = os.environ.get("TIKTOK_CLIENT_SECRET")
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://iliaskalalou.github.io/Pianorama_publish")
-BACKEND_URL = os.environ.get("BACKEND_URL", "https://your-app.railway.app")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://iliaskalalou.github.io/content-studio-pro")
+BACKEND_URL = os.environ.get("BACKEND_URL", "https://content-studio-pro.onrender.com")
 REDIRECT_URI = f"{BACKEND_URL}/callback"
 
 if not CLIENT_KEY or not CLIENT_SECRET:
@@ -38,7 +38,7 @@ def home():
     return jsonify({
         "status": "online",
         "version": VERSION,
-        "service": "Pianorama Publish TikTok OAuth Backend",
+        "service": "Content Studio Pro Backend",
         "endpoints": {
             "/auth": "Initiate OAuth flow",
             "/callback": "OAuth callback",

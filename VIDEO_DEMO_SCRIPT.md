@@ -10,11 +10,11 @@ previous rejection.
 0. Pre-flight checks (must be done before pressing record)
 ------------------------------------------------------------
 
-1. **Render service**: open https://pianorama-publish.onrender.com/health
+1. **Render service**: open https://content-studio-pro.onrender.com/health
    in a browser. If it doesn't return `{"status":"healthy"}` instantly,
    wait 30-60 s for Render to wake the service from sleep, then retry.
 
-2. **Frontend**: open https://iliaskalalou.github.io/Pianorama_publish/
+2. **Frontend**: open https://iliaskalalou.github.io/content-studio-pro/
    in a private/incognito window. Verify the redesigned landing page
    loads (header reading "Content Studio Pro").
 
@@ -23,8 +23,8 @@ previous rejection.
      top of the app page).
    - **Platforms** section: only **Web** is checked. Desktop is
      unchecked.
-   - **Web URL** points to https://iliaskalalou.github.io/Pianorama_publish/
-   - **Redirect URI**: https://pianorama-publish.onrender.com/callback
+   - **Web URL** points to https://iliaskalalou.github.io/content-studio-pro/
+   - **Redirect URI**: https://content-studio-pro.onrender.com/callback
    - **Scopes**: user.info.basic, video.publish, video.upload (all 3
      are listed — we cannot uncheck video.upload because it is bundled
      with the Content Posting API product).
@@ -36,8 +36,8 @@ previous rejection.
    ```
    TIKTOK_CLIENT_KEY     = sbaw9sck9i4u94jbyw
    TIKTOK_CLIENT_SECRET  = Iwl5nMhrxo3S5xUfixLam6Ha74DR19am
-   FRONTEND_URL          = https://iliaskalalou.github.io/Pianorama_publish
-   BACKEND_URL           = https://pianorama-publish.onrender.com
+   FRONTEND_URL          = https://iliaskalalou.github.io/content-studio-pro
+   BACKEND_URL           = https://content-studio-pro.onrender.com
    ```
 
 5. **Record set-up**:
