@@ -298,6 +298,37 @@ def upload_draft():
         "message": payload.get("error", {}).get("message", "Draft upload failed."),
     }), status if status != 200 else 500
 
+# --- TikTok URL verification files ---
+# TikTok asks for a static .txt file at the URL we declared as Redirect URI.
+# Since Render does not serve static files, we expose the file content
+# through a Flask route that matches several common verification paths.
+TIKTOK_VERIFICATIONS = {
+    "tiktokhgNUP2jOBL4lC10ioiEatBEgMxy0ow8L.txt":
+        "tiktok-developers-site-verification=hgNUP2jOBL4lC10ioiEatBEgMxy0ow8L",
+}
+
+
+def _serve_tiktok_verification(filename):
+    body = TIKTOK_VERIFICATIONS.get(filename)
+    if body is None:
+        return "Not Found", 404
+    return body, 200, {"Content-Type": "text/plain"}
+
+
+@app.route('/<path:filename>.txt')
+def tiktok_verification_root(filename):
+    """Serve TikTok verification files at the domain root, e.g.
+    https://pianorama-publish.onrender.com/tiktokXXX.txt"""
+    return _serve_tiktok_verification(f"{filename}.txt")
+
+
+@app.route('/callback/<path:filename>.txt')
+def tiktok_verification_under_callback(filename):
+    """Serve TikTok verification files directly under /callback, e.g.
+    https://pianorama-publish.onrender.com/callback/tiktokXXX.txt"""
+    return _serve_tiktok_verification(f"{filename}.txt")
+
+
 @app.route('/health')
 def health():
     """Health check endpoint"""
