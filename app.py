@@ -34,7 +34,7 @@ if not CLIENT_KEY or not CLIENT_SECRET:
         "(e.g. via Railway / Render / Heroku config or a local .env file)."
     )
 
-VERSION = "v2.1-2026-05-07-real-publish"
+VERSION = "v2.2-2026-05-12-cors-fix"
 
 
 @app.route('/')
