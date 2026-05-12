@@ -13,7 +13,12 @@ from urllib.parse import urlencode
 app = Flask(__name__)
 # Render's free tier accepts up to ~100 MB request bodies; cap to 100 MB.
 app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024
-CORS(app, origins=["https://iliaskalalou.github.io", "http://localhost:*"])
+CORS(app, origins=[
+    "https://contentstudiopro.com",
+    "https://www.contentstudiopro.com",
+    "https://iliaskalalou.github.io",
+    "http://localhost:*",
+])
 
 # TikTok configuration. Read everything from environment variables; the
 # secret must never be hardcoded into a file that gets committed.
