@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Data Deletion - Content Studio Pro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/icon.png">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #f5f5f5;
+        }
+        .content {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #4f46e5;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #4f46e5;
+            margin-top: 30px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #4f46e5;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .brand-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .brand-header img {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+        .brand-header .brand-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2c3e50;
+            letter-spacing: -0.01em;
+        }
+        .callout {
+            background: #eef2ff;
+            border-left: 4px solid #4f46e5;
+            padding: 14px 18px;
+            margin: 18px 0;
+            border-radius: 6px;
+        }
+        ol {
+            padding-left: 20px;
+        }
+        ol li {
+            margin-bottom: 8px;
+        }
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <a href="../" class="back-link">← Back to Content Studio Pro</a>
+
+        <div class="brand-header">
+            <img src="/icon.png" alt="Content Studio Pro logo">
+            <span class="brand-name">Content Studio Pro</span>
+        </div>
+
+        <h1>User Data Deletion for Content Studio Pro</h1>
+        <p><strong>Last Updated:</strong> May 2026</p>
+
+        <p>Content Studio Pro is a publishing tool that authenticates creators through
+        TikTok and Instagram OAuth and forwards their content to those platforms. We do
+        not maintain any persistent user database. Nevertheless, you may request the
+        deletion of any data associated with your use of Content Studio Pro at any time.</p>
+
+        <h2>1. What data Content Studio Pro processes</h2>
+        <p>When you connect a TikTok or Instagram account to Content Studio Pro, the
+        following information is processed:</p>
+        <ul>
+            <li>The OAuth access token issued by TikTok or Instagram (stored only in your
+            browser session storage, discarded when you close the tab).</li>
+            <li>Basic profile information returned by the platform (display name, avatar,
+            open id, union id) used to identify the connected creator on the dashboard.</li>
+            <li>Video files you choose to publish, which are streamed to TikTok or
+            Instagram and not retained on our servers after upload completes.</li>
+            <li>The captions, privacy levels, and commercial-content disclosure flags you
+            enter for each post.</li>
+        </ul>
+
+        <h2>2. How to delete your data</h2>
+        <p>Because Content Studio Pro acts as a thin client between you and the connected
+        platforms, the most direct way to revoke our access and erase the only persistent
+        link to your account is to disconnect Content Studio Pro from the platform itself.</p>
+
+        <h3>For TikTok</h3>
+        <ol>
+            <li>Open the TikTok mobile app.</li>
+            <li>Go to <strong>Settings and privacy</strong> → <strong>Security and login</strong>
+            → <strong>Manage apps</strong>.</li>
+            <li>Find <strong>Content Studio Pro</strong> in the list and tap
+            <strong>Disconnect</strong> (or <strong>Remove access</strong>).</li>
+        </ol>
+        <p>Once disconnected, the OAuth access token previously issued to Content Studio
+        Pro is invalidated by TikTok and our service can no longer read your data or
+        publish on your behalf.</p>
+
+        <h3>For Instagram</h3>
+        <ol>
+            <li>Open the Instagram mobile app.</li>
+            <li>Go to <strong>Settings and activity</strong> → <strong>Apps and websites</strong>
+            (or <strong>Website permissions</strong>).</li>
+            <li>Locate <strong>Content Studio Pro</strong> and tap <strong>Remove</strong>.</li>
+        </ol>
+        <p>Once removed, Instagram invalidates the OAuth access token issued to Content
+        Studio Pro and our service can no longer read your data or publish on your behalf.</p>
+
+        <h2>3. Email request for deletion</h2>
+        <p>You may also send a written deletion request by email to:</p>
+        <div class="callout">
+            <strong>ilias.kalalou@gmail.com</strong><br>
+            Subject: <code>Data deletion request - Content Studio Pro</code><br>
+            Body: please include the connected creator's display name on TikTok and/or
+            Instagram so we can confirm there is no residual session data on our side.
+        </div>
+        <p>We will confirm completion of the deletion within <strong>30 days</strong> of
+        receiving the request, in line with the GDPR / RGPD requirements.</p>
+
+        <h2>4. What is automatically deleted vs. retained</h2>
+        <ul>
+            <li><strong>Automatically deleted</strong>: OAuth access tokens (discarded
+            when you close the browser tab), uploaded video files (streamed to the
+            platform and not stored on our servers).</li>
+            <li><strong>Retained for audit/logs (up to 30 days)</strong>: server-side
+            request logs that may contain the timestamp of OAuth authentications and
+            publish requests. These logs are purged automatically.</li>
+            <li><strong>Never collected</strong>: passwords, payment information, contact
+            lists, content from other platforms, browsing history.</li>
+        </ul>
+
+        <h2>5. Contact</h2>
+        <p>For any question about this Data Deletion policy or about how Content Studio
+        Pro processes your data:</p>
+        <p>Email: <a href="mailto:ilias.kalalou@gmail.com">ilias.kalalou@gmail.com</a></p>
+    </div>
+</body>
+</html>
