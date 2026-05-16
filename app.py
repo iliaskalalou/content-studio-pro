@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
 """
-Backend Flask pour TikTok OAuth - Production Ready
+Backend Flask pour Content Studio Pro
+TikTok OAuth + Content Posting + Instagram OAuth + Content Publishing
 Déployable sur Railway, Heroku, Render
 """
 
-from flask import Flask, request, jsonify, redirect
+from flask import Flask, request, jsonify, redirect, send_file, abort
 from flask_cors import CORS
+import hashlib
+import hmac
+import io
+import json
 import requests
 import os
+import secrets
+import threading
+import time
 from urllib.parse import urlencode
 
 app = Flask(__name__)
@@ -34,7 +42,16 @@ if not CLIENT_KEY or not CLIENT_SECRET:
         "(e.g. via Railway / Render / Heroku config or a local .env file)."
     )
 
-VERSION = "v2.2-2026-05-12-cors-fix"
+# Instagram (Meta) configuration. Optional: only needed if Instagram OAuth
+# is used. The app starts up fine without these — Instagram routes will return
+# 503 if they are missing.
+INSTAGRAM_APP_ID = os.environ.get("INSTAGRAM_APP_ID", "927504810318319")
+INSTAGRAM_APP_SECRET = os.environ.get("INSTAGRAM_APP_SECRET", "")
+INSTAGRAM_REDIRECT_URI = f"{BACKEND_URL}/instagram/callback"
+INSTAGRAM_SCOPES = "instagram_business_basic,instagram_business_content_publish"
+INSTAGRAM_GRAPH_VERSION = "v23.0"
+
+VERSION = "v2.3-2026-05-16-instagram"
 
 
 @app.route('/')
@@ -45,11 +62,17 @@ def home():
         "version": VERSION,
         "service": "Content Studio Pro Backend",
         "endpoints": {
-            "/auth": "Initiate OAuth flow",
-            "/callback": "OAuth callback",
-            "/api/user-info": "Get user info",
-            "/api/publish": "Publish video directly to the user's profile (video.publish)",
-            "/api/upload": "Upload video as a draft for the user to edit and post (video.upload)"
+            "/auth": "Initiate TikTok OAuth flow",
+            "/callback": "TikTok OAuth callback",
+            "/api/user-info": "Get TikTok user info",
+            "/api/publish": "Publish video directly to TikTok (video.publish)",
+            "/api/upload": "Upload video as TikTok draft (video.upload)",
+            "/instagram/auth": "Initiate Instagram OAuth flow",
+            "/instagram/callback": "Instagram OAuth callback",
+            "/instagram/deauthorize": "Webhook called by Meta when a user revokes our app",
+            "/instagram/data-deletion-callback": "Webhook called by Meta when a user requests deletion",
+            "/api/instagram/user-info": "Get connected Instagram creator profile",
+            "/api/instagram/publish": "Publish a video as a Reel on Instagram",
         }
     })
 
@@ -302,6 +325,332 @@ def upload_draft():
         "error": payload.get("error", {}),
         "message": payload.get("error", {}).get("message", "Draft upload failed."),
     }), status if status != 200 else 500
+
+# --- Instagram OAuth + Content Publishing ---
+# Implements the new "Instagram API with Instagram Login" flow (launched 2024).
+# OAuth endpoints are on instagram.com, Graph API on graph.instagram.com.
+# Content publishing on Instagram requires a publicly accessible video URL
+# (pull-from-URL only), so we host the uploaded bytes in memory for ~1h.
+_instagram_tmp_videos = {}  # tmp_id -> {bytes, expires_at}
+_INSTAGRAM_TMP_TTL_SECONDS = 3600
+_instagram_tmp_lock = threading.Lock()
+
+
+def _instagram_configured():
+    return bool(INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET)
+
+
+def _instagram_store_tmp_video(file_bytes):
+    """Store uploaded video bytes in memory, return the public URL."""
+    tmp_id = secrets.token_urlsafe(24) + ".mp4"
+    with _instagram_tmp_lock:
+        # Opportunistic cleanup of expired entries
+        now = time.time()
+        for old_id in list(_instagram_tmp_videos.keys()):
+            if _instagram_tmp_videos[old_id]["expires_at"] < now:
+                _instagram_tmp_videos.pop(old_id, None)
+        _instagram_tmp_videos[tmp_id] = {
+            "bytes": file_bytes,
+            "expires_at": now + _INSTAGRAM_TMP_TTL_SECONDS,
+        }
+    return f"{BACKEND_URL}/instagram/tmp-video/{tmp_id}"
+
+
+@app.route('/instagram/tmp-video/<tmp_id>')
+def instagram_serve_tmp_video(tmp_id):
+    """Serve a temporary video so Instagram can pull it (push_by_url flow)."""
+    with _instagram_tmp_lock:
+        entry = _instagram_tmp_videos.get(tmp_id)
+        if entry and entry["expires_at"] < time.time():
+            _instagram_tmp_videos.pop(tmp_id, None)
+            entry = None
+    if not entry:
+        return ("Not Found or Expired", 404)
+    return send_file(
+        io.BytesIO(entry["bytes"]),
+        mimetype="video/mp4",
+        as_attachment=False,
+        download_name=tmp_id,
+    )
+
+
+@app.route('/instagram/auth')
+def instagram_auth():
+    """Start the Instagram OAuth flow (Business Login)."""
+    if not _instagram_configured():
+        return jsonify({"error": "Instagram not configured on this backend"}), 503
+    params = {
+        "client_id": INSTAGRAM_APP_ID,
+        "response_type": "code",
+        "scope": INSTAGRAM_SCOPES,
+        "redirect_uri": INSTAGRAM_REDIRECT_URI,
+        "state": request.args.get('state', secrets.token_urlsafe(12)),
+    }
+    auth_url = f"https://www.instagram.com/oauth/authorize?{urlencode(params)}"
+    return redirect(auth_url)
+
+
+@app.route('/instagram/callback')
+def instagram_callback():
+    """OAuth callback for Instagram. Exchanges code -> short-lived token,
+    then upgrades to a long-lived token (~60 days)."""
+    if not _instagram_configured():
+        return jsonify({"error": "Instagram not configured on this backend"}), 503
+
+    code = request.args.get('code')
+    err = request.args.get('error') or request.args.get('error_description')
+    if err:
+        return redirect(f"{FRONTEND_URL}?ig_error={err}")
+    if not code:
+        return redirect(f"{FRONTEND_URL}?ig_error=no_code")
+
+    # 1) Exchange code -> short-lived token (~1h)
+    try:
+        short_resp = requests.post(
+            "https://api.instagram.com/oauth/access_token",
+            data={
+                "client_id": INSTAGRAM_APP_ID,
+                "client_secret": INSTAGRAM_APP_SECRET,
+                "grant_type": "authorization_code",
+                "redirect_uri": INSTAGRAM_REDIRECT_URI,
+                "code": code,
+            },
+            timeout=15,
+        )
+        short_data = short_resp.json()
+    except Exception as e:
+        app.logger.error(f"Instagram short token exchange failed: {e}")
+        return redirect(f"{FRONTEND_URL}?ig_error=server_error")
+
+    short_token = short_data.get("access_token")
+    if not short_token:
+        app.logger.error(f"Instagram short token missing: {short_data}")
+        return redirect(f"{FRONTEND_URL}?ig_error=token_exchange_failed")
+
+    # 2) Upgrade to long-lived token (~60 days)
+    try:
+        long_resp = requests.get(
+            f"https://graph.instagram.com/{INSTAGRAM_GRAPH_VERSION}/access_token",
+            params={
+                "grant_type": "ig_exchange_token",
+                "client_secret": INSTAGRAM_APP_SECRET,
+                "access_token": short_token,
+            },
+            timeout=15,
+        )
+        long_data = long_resp.json()
+    except Exception as e:
+        app.logger.error(f"Instagram long token exchange failed: {e}")
+        long_data = {}
+
+    long_token = long_data.get("access_token", short_token)
+    expires_in = long_data.get("expires_in", 3600)
+    return redirect(
+        f"{FRONTEND_URL}?ig_token={long_token}&ig_expires_in={expires_in}&ig_success=true"
+    )
+
+
+def _parse_signed_request(signed_request: str):
+    """Parse Meta's signed_request payload, verify HMAC-SHA256 signature.
+    Returns the decoded payload dict, or None if signature is invalid."""
+    import base64
+    if not signed_request or '.' not in signed_request:
+        return None
+    try:
+        encoded_sig, payload = signed_request.split('.', 1)
+        # Add padding for base64url
+        def _b64decode(s):
+            s = s + '=' * (-len(s) % 4)
+            return base64.urlsafe_b64decode(s)
+        sig = _b64decode(encoded_sig)
+        data = json.loads(_b64decode(payload).decode('utf-8'))
+        expected = hmac.new(
+            INSTAGRAM_APP_SECRET.encode('utf-8'),
+            payload.encode('utf-8'),
+            hashlib.sha256,
+        ).digest()
+        if not hmac.compare_digest(sig, expected):
+            app.logger.warning("Instagram signed_request: signature mismatch")
+            return None
+        return data
+    except Exception as e:
+        app.logger.error(f"Instagram signed_request parse failed: {e}")
+        return None
+
+
+@app.route('/instagram/deauthorize', methods=['POST'])
+def instagram_deauthorize():
+    """Webhook called by Meta when a user removes our app from their Instagram
+    authorized apps. We do not store user data persistently, so there is
+    nothing to delete server-side; we just acknowledge the notification."""
+    if not _instagram_configured():
+        return ("Instagram not configured", 503)
+    signed_request = request.form.get("signed_request", "")
+    payload = _parse_signed_request(signed_request)
+    if payload is None:
+        return ("Invalid signature", 400)
+    app.logger.info(f"Instagram deauthorization received for user_id={payload.get('user_id')}")
+    return ("OK", 200)
+
+
+@app.route('/instagram/data-deletion-callback', methods=['POST'])
+def instagram_data_deletion_callback():
+    """Webhook called by Meta when a user requests deletion of their data
+    associated with our app. We must respond with a JSON containing a status
+    URL and a confirmation_code, per Meta's specification."""
+    if not _instagram_configured():
+        return ("Instagram not configured", 503)
+    signed_request = request.form.get("signed_request", "")
+    payload = _parse_signed_request(signed_request)
+    if payload is None:
+        return ("Invalid signature", 400)
+    user_id = payload.get('user_id', 'unknown')
+    confirmation_code = hashlib.sha256(
+        f"{user_id}-{INSTAGRAM_APP_SECRET}".encode('utf-8')
+    ).hexdigest()[:16]
+    app.logger.info(f"Instagram data deletion request for user_id={user_id}, code={confirmation_code}")
+    # We do not store user data persistently, so the deletion is immediate.
+    return jsonify({
+        "url": f"{FRONTEND_URL}/data-deletion?ig_user_id={user_id}&code={confirmation_code}",
+        "confirmation_code": confirmation_code,
+    })
+
+
+@app.route('/api/instagram/user-info')
+def instagram_user_info():
+    """Return the connected Instagram creator profile (id, username, etc.)."""
+    if not _instagram_configured():
+        return jsonify({"error": "Instagram not configured"}), 503
+    token = _read_token()
+    if not token:
+        return jsonify({"error": "No token provided"}), 401
+    try:
+        resp = requests.get(
+            f"https://graph.instagram.com/{INSTAGRAM_GRAPH_VERSION}/me",
+            params={
+                "fields": "id,username,account_type,profile_picture_url",
+                "access_token": token,
+            },
+            timeout=10,
+        )
+        data = resp.json()
+        if resp.status_code != 200 or "id" not in data:
+            app.logger.error(f"Instagram user-info error: {data}")
+            return jsonify({"error": data}), 400
+        return jsonify(data)
+    except Exception as e:
+        app.logger.error(f"Instagram user-info request failed: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/instagram/publish', methods=['POST'])
+def instagram_publish():
+    """Publish a video as an Instagram Reel.
+    Flow (pull-from-URL):
+      1. Host the uploaded bytes temporarily at /instagram/tmp-video/<id>
+      2. Create a media container (media_type=REELS, video_url=tmp URL)
+      3. Poll the container until status_code == FINISHED
+      4. Publish the container via /media_publish
+    """
+    if not _instagram_configured():
+        return jsonify({"error": "Instagram not configured"}), 503
+    token = _read_token()
+    if not token:
+        return jsonify({"error": "No token provided"}), 401
+
+    caption = request.form.get('caption', '')
+    share_to_feed = request.form.get('share_to_feed', 'true').lower() == 'true'
+    filename, file_bytes = _read_video_file()
+    if not file_bytes:
+        return jsonify({"success": False, "message": "No video file provided"}), 400
+
+    # 1) Host the video temporarily so Instagram can pull it
+    video_url = _instagram_store_tmp_video(file_bytes)
+
+    # 2) Resolve the Instagram user id
+    try:
+        me_resp = requests.get(
+            f"https://graph.instagram.com/{INSTAGRAM_GRAPH_VERSION}/me",
+            params={"fields": "id,username", "access_token": token},
+            timeout=10,
+        )
+        me_data = me_resp.json()
+    except Exception as e:
+        return jsonify({"error": f"Could not resolve Instagram user: {e}"}), 500
+    ig_user_id = me_data.get("id")
+    if not ig_user_id:
+        app.logger.error(f"Instagram /me failed: {me_data}")
+        return jsonify({"error": "Could not resolve Instagram user id", "details": me_data}), 400
+
+    # 3) Create the media container
+    try:
+        container_resp = requests.post(
+            f"https://graph.instagram.com/{INSTAGRAM_GRAPH_VERSION}/{ig_user_id}/media",
+            params={
+                "media_type": "REELS",
+                "video_url": video_url,
+                "caption": caption,
+                "share_to_feed": "true" if share_to_feed else "false",
+                "access_token": token,
+            },
+            timeout=30,
+        )
+        container_data = container_resp.json()
+    except Exception as e:
+        return jsonify({"error": f"Container creation failed: {e}"}), 500
+    container_id = container_data.get("id")
+    if not container_id:
+        app.logger.error(f"Instagram container creation failed: {container_data}")
+        return jsonify({"error": "Container creation failed", "details": container_data}), 400
+
+    # 4) Poll until container is ready
+    deadline = time.time() + 180
+    last_status = None
+    while time.time() < deadline:
+        time.sleep(3)
+        try:
+            status_resp = requests.get(
+                f"https://graph.instagram.com/{INSTAGRAM_GRAPH_VERSION}/{container_id}",
+                params={"fields": "status_code,status", "access_token": token},
+                timeout=10,
+            )
+            status_data = status_resp.json()
+        except Exception as e:
+            app.logger.warning(f"Instagram status check failed: {e}")
+            continue
+        last_status = status_data.get("status_code")
+        if last_status == "FINISHED":
+            break
+        if last_status in ("ERROR", "EXPIRED"):
+            app.logger.error(f"Instagram container processing failed: {status_data}")
+            return jsonify({"error": "Container processing failed", "details": status_data}), 500
+    else:
+        return jsonify({"error": "Container processing timeout", "last_status": last_status}), 504
+
+    # 5) Publish
+    try:
+        publish_resp = requests.post(
+            f"https://graph.instagram.com/{INSTAGRAM_GRAPH_VERSION}/{ig_user_id}/media_publish",
+            params={"creation_id": container_id, "access_token": token},
+            timeout=30,
+        )
+        publish_data = publish_resp.json()
+    except Exception as e:
+        return jsonify({"error": f"Publish call failed: {e}"}), 500
+    media_id = publish_data.get("id")
+    if not media_id:
+        app.logger.error(f"Instagram publish failed: {publish_data}")
+        return jsonify({"error": "Publish failed", "details": publish_data}), 400
+
+    return jsonify({
+        "success": True,
+        "media_id": media_id,
+        "container_id": container_id,
+        "filename": filename,
+        "share_to_feed": share_to_feed,
+        "message": f"Reel published on Instagram (media_id={media_id}).",
+    })
+
 
 # --- TikTok URL verification files ---
 # TikTok asks for a static .txt file at the URL we declared as Redirect URI.

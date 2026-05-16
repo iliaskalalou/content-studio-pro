@@ -78,25 +78,30 @@
         or "the Service") collects, uses, and shares your personal information
         when you use the Content Studio Pro web application (the "Service")
         available at
-        <a href="https://contentstudiopro.com/">https://contentstudiopro.com/</a>.</p>
+        <a href="https://contentstudiopro.com/">https://contentstudiopro.com/</a>.
+        Content Studio Pro is a multi-platform publishing tool that connects to
+        TikTok and Instagram on your behalf, via the official OAuth flows
+        provided by each platform.</p>
 
         <h2>1. Information Content Studio Pro Collects</h2>
         <p>When you use Content Studio Pro to publish content to a connected
-        social media account (such as TikTok), Content Studio Pro processes the
-        following information:</p>
+        social media account (TikTok or Instagram), Content Studio Pro processes
+        the following information:</p>
         <ul>
-            <li>OAuth access tokens issued by TikTok after you authorize Content Studio Pro to act on your behalf.</li>
+            <li>OAuth access tokens issued by TikTok or by Meta (for Instagram) after you authorize Content Studio Pro to act on your behalf.</li>
             <li>Basic profile information from TikTok (display name, avatar, open id, union id) returned by the <code>user.info.basic</code> scope, used only to identify the connected creator inside the Content Studio Pro dashboard.</li>
-            <li>Video files you upload to Content Studio Pro for publication. The bytes are forwarded to TikTok's Content Posting API and are not retained on our servers after the upload completes.</li>
-            <li>Captions, privacy level selections, and commercial-content disclosures you enter for each post.</li>
+            <li>Basic profile information from Instagram (id, username, profile picture URL, account type) returned by the <code>instagram_business_basic</code> scope, used only to identify the connected Instagram creator inside the Content Studio Pro dashboard.</li>
+            <li>Video files you upload to Content Studio Pro for publication. For TikTok the bytes are streamed directly to TikTok's Content Posting API; for Instagram the bytes are temporarily cached on our backend for up to one hour so that Instagram's Graph API can pull them, then automatically purged.</li>
+            <li>Captions, privacy level selections, commercial-content disclosures, and "share to feed" preferences you enter for each post.</li>
         </ul>
 
         <h2>2. How Content Studio Pro Uses Your Information</h2>
         <p>Content Studio Pro uses the information described above strictly to:</p>
         <ul>
-            <li>Authenticate you with TikTok via OAuth 2.0.</li>
+            <li>Authenticate you with TikTok and Instagram via OAuth 2.0.</li>
             <li>Display your connected creator profile in the Content Studio Pro dashboard so you can confirm the right account is linked.</li>
             <li>Forward your video, caption, privacy choice, and disclosure flag to the TikTok Content Posting API to either publish directly (<code>video.publish</code>) or send the post to your TikTok inbox as a draft (<code>video.upload</code>).</li>
+            <li>Forward your video and caption to the Instagram Graph API to publish a Reel (<code>instagram_business_content_publish</code>).</li>
         </ul>
         <p>Content Studio Pro does not use your data for advertising, profiling, training of AI models, or any purpose unrelated to publishing the content you submit.</p>
 
@@ -105,28 +110,41 @@
         Your information is shared only in the following circumstances:</p>
         <ul>
             <li>With <strong>TikTok</strong>, to perform the API calls you initiate (publish a video, save a draft, query your basic profile information).</li>
+            <li>With <strong>Meta / Instagram</strong>, to perform the API calls you initiate (publish a Reel, query your basic Instagram profile information).</li>
             <li>With our hosting provider <strong>Render</strong>, which runs the Content Studio Pro backend (Frankfurt, EU).</li>
             <li>When required by law, court order, or to protect the rights and safety of Content Studio Pro and its users.</li>
         </ul>
 
         <h2>4. Data Retention</h2>
-        <p>Content Studio Pro keeps your OAuth access token only for the duration
-        of your active session. Tokens are stored in your browser's session
-        storage and are discarded when you close the tab. Video files are streamed
-        to TikTok and are not stored persistently on Content Studio Pro's
-        servers.</p>
+        <p>Content Studio Pro keeps your OAuth access tokens only for the duration
+        of your active browser session. Tokens are stored in your browser's session
+        storage and are discarded when you close the tab. TikTok video files are
+        streamed directly to TikTok and are never stored on our servers. Instagram
+        video files are temporarily cached on our backend for up to one hour to
+        allow Instagram's Graph API to pull them, and are automatically purged
+        from memory immediately after the publication succeeds (or after 60
+        minutes if the request is abandoned).</p>
 
         <h2>5. Your Rights</h2>
-        <p>Because Content Studio Pro acts as a thin client between you and
-        TikTok, the most reliable way to revoke access is to remove Content
-        Studio Pro from your TikTok authorized apps list:</p>
+        <p>Because Content Studio Pro acts as a thin client between you and the
+        connected platforms, the most reliable way to revoke access is to remove
+        Content Studio Pro from each platform's authorized apps list:</p>
+        <p><strong>For TikTok:</strong></p>
         <ul>
             <li>Open the TikTok mobile app -> Settings and privacy -> Security and login -> Manage apps</li>
             <li>Find Content Studio Pro and tap Disconnect</li>
         </ul>
-        <p>You also have the right, under applicable data protection law, to
-        access, correct, or request the deletion of your personal data, and to
-        object to data processing. Contact us using the address below.</p>
+        <p><strong>For Instagram:</strong></p>
+        <ul>
+            <li>Open the Instagram mobile app -> Settings and activity -> Apps and websites (or Website permissions)</li>
+            <li>Locate Content Studio Pro and tap Remove</li>
+        </ul>
+        <p>You may also request deletion of any data associated with your use of
+        Content Studio Pro by visiting our dedicated page at
+        <a href="https://contentstudiopro.com/data-deletion">contentstudiopro.com/data-deletion</a>
+        or by writing to us at the address below. You also have the right, under
+        applicable data protection law, to access, correct, or request the
+        deletion of your personal data, and to object to data processing.</p>
 
         <h2>6. Security</h2>
         <p>Content Studio Pro uses HTTPS for all traffic. OAuth client secrets

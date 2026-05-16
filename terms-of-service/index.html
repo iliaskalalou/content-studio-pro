@@ -78,7 +78,7 @@
         Content Studio Pro (the "Service"), a web application available at
         <a href="https://contentstudiopro.com/">https://contentstudiopro.com/</a>
         that helps creators schedule, manage, and publish video content to
-        connected social media platforms such as TikTok.</p>
+        connected social media platforms such as TikTok and Instagram.</p>
 
         <h2>1. Acceptance of the Terms</h2>
         <p>By accessing or using Content Studio Pro, you confirm that you have
@@ -90,9 +90,10 @@
         <p>Content Studio Pro is a publishing tool. It does not host, edit or
         republish your content. Specifically, Content Studio Pro:</p>
         <ul>
-            <li>Authenticates you with TikTok via OAuth 2.0 (the "Login Kit").</li>
+            <li>Authenticates you with TikTok via OAuth 2.0 (the "Login Kit") and with Instagram via the Instagram API Business Login flow.</li>
             <li>Lets you upload a video, choose a privacy level, and disclose any commercial intent.</li>
             <li>Forwards the request to TikTok's Content Posting API either as a Direct Post (<code>video.publish</code>) or as a draft to your TikTok inbox (<code>video.upload</code>).</li>
+            <li>Forwards the request to Instagram's Graph API to publish a Reel on your account (<code>instagram_business_content_publish</code>).</li>
         </ul>
 
         <h2>3. License to Use Content Studio Pro</h2>
@@ -103,16 +104,17 @@
 
         <h2>4. Account and Authentication</h2>
         <p>You authenticate to Content Studio Pro by linking your TikTok creator
-        account through TikTok's OAuth flow. You are responsible for maintaining
-        the security of your TikTok credentials. Content Studio Pro never sees
-        your TikTok password.</p>
+        account through TikTok's OAuth flow and/or your Instagram Business or
+        Creator account through Meta's OAuth flow. You are responsible for
+        maintaining the security of your credentials on each platform. Content
+        Studio Pro never sees your TikTok or Instagram password.</p>
 
         <h2>5. Content You Submit</h2>
         <p>You retain all ownership rights in the videos and captions you
         submit through Content Studio Pro. By using Content Studio Pro, you
-        grant us the limited right to transmit your content to TikTok solely
-        to fulfil your publishing request. Content Studio Pro does not store,
-        modify, or repurpose your content.</p>
+        grant us the limited right to transmit your content to TikTok and/or
+        Instagram solely to fulfil your publishing request. Content Studio Pro
+        does not store, modify, or repurpose your content.</p>
         <p>You represent and warrant that you have the rights to the content
         you submit and that the content does not violate any third-party
         rights or applicable law.</p>
@@ -123,18 +125,29 @@
             <li>To upload illegal, infringing, or harmful content (including content that depicts violence, hate speech, or sexual abuse).</li>
             <li>To impersonate any other person or entity.</li>
             <li>To upload malware or attempt to disrupt the Service.</li>
-            <li>To circumvent TikTok's own community guidelines or terms.</li>
+            <li>To circumvent TikTok's or Instagram's own community guidelines or terms.</li>
             <li>To send spam or unsolicited promotional content.</li>
         </ul>
 
-        <h2>7. TikTok Compliance</h2>
+        <h2>7. Platform Compliance</h2>
         <p>When you publish through Content Studio Pro, your post is also
-        subject to TikTok's
-        <a href="https://www.tiktok.com/legal/terms-of-service" target="_blank" rel="noopener">Terms of Service</a>
-        and
-        <a href="https://www.tiktok.com/community-guidelines" target="_blank" rel="noopener">Community Guidelines</a>.
-        Content Studio Pro forwards your privacy choice and your commercial-content
-        disclosure to TikTok exactly as you set them, without modification.</p>
+        subject to the terms and community guidelines of the platform you are
+        publishing to:</p>
+        <ul>
+            <li>TikTok's
+            <a href="https://www.tiktok.com/legal/terms-of-service" target="_blank" rel="noopener">Terms of Service</a>
+            and
+            <a href="https://www.tiktok.com/community-guidelines" target="_blank" rel="noopener">Community Guidelines</a>.</li>
+            <li>Instagram's
+            <a href="https://help.instagram.com/581066165581870" target="_blank" rel="noopener">Terms of Use</a>
+            and
+            <a href="https://help.instagram.com/477434105621119" target="_blank" rel="noopener">Community Guidelines</a>,
+            as well as Meta's
+            <a href="https://developers.facebook.com/terms" target="_blank" rel="noopener">Platform Terms</a>.</li>
+        </ul>
+        <p>Content Studio Pro forwards your privacy choice, your
+        commercial-content disclosure, your caption and your video to each
+        platform exactly as you set them, without modification.</p>
 
         <h2>8. Disclaimer</h2>
         <p>Content Studio Pro is provided "as is" without warranties of any
