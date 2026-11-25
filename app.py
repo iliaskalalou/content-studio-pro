@@ -72,10 +72,11 @@ def home():
             "/instagram/deauthorize": "Webhook called by Meta when a user revokes our app",
             "/instagram/data-deletion-callback": "Webhook called by Meta when a user requests deletion",
             "/api/instagram/user-info": "Get connected Instagram creator profile",
-            "/api/instagram/publish": "Step 1: upload video + create Instagram container (returns container_id)",
+            "/api/instagram/publish": "Step 1: upload video (+ optional JPEG 'cover' or 'thumb_offset' in ms) + create Instagram container (returns container_id)",
             "/api/instagram/publish/status": "Step 2: poll container status_code until FINISHED",
             "/api/instagram/publish/finalize": "Step 3: publish the container (returns final media_id)",
-        }
+        },
+        "features": ["instagram_cover"],
     })
 
 @app.route('/auth')
@@ -651,6 +652,18 @@ def instagram_publish():
     # 1) Host the video temporarily so Instagram can pull it
     video_url = _instagram_store_tmp_video(file_bytes)
 
+    # Optional cover: a JPEG file ('cover', hosted like carousel images) or a frame of the video ('thumb_offset', ms).
+    # Both absent => Instagram picks the first frame, exactly as before.
+    cover_url = None
+    cover_file = request.files.get('cover')
+    if cover_file:
+        cover_bytes = cover_file.read()
+        if cover_bytes:
+            cover_url = _instagram_store_tmp_image(cover_bytes)
+    thumb_offset = (request.form.get('thumb_offset') or '').strip()
+    if not thumb_offset.isdigit():
+        thumb_offset = None
+
     # 2) Resolve the Instagram user id
     try:
         me_resp = requests.get(
@@ -667,17 +680,22 @@ def instagram_publish():
         return jsonify({"error": "Could not resolve Instagram user id", "details": me_data}), 400
 
     # 3) Create the media container (returns immediately)
+    container_params = {
+        "media_type": "REELS",
+        "video_url": video_url,
+        "caption": caption,
+        "share_to_feed": "true" if share_to_feed else "false",
+        "is_ai_generated": "true" if is_ai_generated else "false",
+        "access_token": token,
+    }
+    if cover_url:
+        container_params["cover_url"] = cover_url
+    elif thumb_offset:
+        container_params["thumb_offset"] = thumb_offset
     try:
         container_resp = requests.post(
             f"https://graph.instagram.com/{INSTAGRAM_GRAPH_VERSION}/{ig_user_id}/media",
-            params={
-                "media_type": "REELS",
-                "video_url": video_url,
-                "caption": caption,
-                "share_to_feed": "true" if share_to_feed else "false",
-                "is_ai_generated": "true" if is_ai_generated else "false",
-                "access_token": token,
-            },
+            params=container_params,
             timeout=20,
         )
         container_data = container_resp.json()
@@ -697,6 +715,8 @@ def instagram_publish():
         "share_to_feed": share_to_feed,
         "is_ai_generated": is_ai_generated,
         "video_url": video_url,
+        "cover_url": cover_url,
+        "thumb_offset": thumb_offset,
         "next_step": "Poll GET /api/instagram/publish/status?container_id=<id> until status_code == FINISHED, then POST /api/instagram/publish/finalize with container_id and ig_user_id.",
     })
 
